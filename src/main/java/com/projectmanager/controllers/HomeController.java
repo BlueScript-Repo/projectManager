@@ -1,0 +1,54 @@
+package com.projectmanager.controllers;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.mvc.AbstractController;
+
+import com.projectmanager.dao.BOQDetailsDao;
+import com.projectmanager.dao.ProjectDao;
+import com.projectmanager.entity.Project;
+
+@Controller
+@EnableWebMvc
+public class HomeController extends AbstractController {
+
+	@Autowired
+	BOQDetailsDao boqDetailsDao;
+
+	@Autowired
+	ProjectDao projectDao;
+
+	final static String VIEW = "Home";
+	final static String NEW_HOME = "newHome";
+
+	@Override
+	@RequestMapping(value = "/home", method = RequestMethod.POST)
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		ModelAndView modelAndView = new ModelAndView(NEW_HOME);
+		String projectIdVal = "";
+
+		projectIdVal = boqDetailsDao.getRecentProject();
+
+		Project project = projectDao.getProject(Integer.parseInt(projectIdVal));
+
+		if (!(projectIdVal.equals("") || projectIdVal.equals("0"))) {
+			modelAndView.addObject("projectDesc", project.getProjectDesc());
+			modelAndView.addObject("projectIdVal", projectIdVal);
+			modelAndView.addObject("projectNameVal", project.getProjectName());
+		} else {
+			modelAndView.addObject("projectDesc", "No Recent Project");
+			modelAndView.addObject("projectIdVal", "No Recent Project");
+			modelAndView.addObject("projectNameVal", "No Recent Project");
+		}
+
+		return modelAndView;
+	}
+}
