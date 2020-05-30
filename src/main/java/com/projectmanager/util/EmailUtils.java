@@ -86,6 +86,16 @@ public class EmailUtils {
 		sendEmail(subject, sender, recipient, text, file);
 
 	}
+	/*public void sendEmailCode(String sender, String recipient, String randomCode){
+		String subject = "Forget Password code";
+		String text = "Please copy following code.";
+		//String from = "ProjectInvManager@gmail.com";
+		
+		
+		File[] filesToattach = null;
+		
+		sendEmail(subject, sender, recipient, text, filesToattach);
+	}*/
 
 	public void sendInquiry(String sender, String recipient, byte[] fileBytes, String inquiryName) {
 		String subject = "Hamdule Projects : Inventory Inquiry";
@@ -164,18 +174,20 @@ public class EmailUtils {
 			mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
 			mc.addMailcap("message/rfc822;; x-java-content- handler=com.sun.mail.handlers.message_rfc822");
 
-			for (File file1 : file) {
-				// Define the attachment
-				MimeBodyPart att = new MimeBodyPart();
+			if(file != null){
+				for (File file1 : file) {
+					// Define the attachment
+					MimeBodyPart att = new MimeBodyPart();
 
-				DataSource fds = new FileDataSource(file1);
-				att.setDataHandler(new DataHandler(fds));
-				att.setFileName(fds.getName());
+					DataSource fds = new FileDataSource(file1);
+					att.setDataHandler(new DataHandler(fds));
+					att.setFileName(fds.getName());
 
-				// Add the attachment to the message.
-				msg.addBodyPart(att);
-			}
-			// Send the email.
+					// Add the attachment to the message.
+					msg.addBodyPart(att);
+				}
+
+			}			// Send the email.
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			message.writeTo(outputStream);
 			RawMessage rawMessage = new RawMessage(ByteBuffer.wrap(outputStream.toByteArray()));
