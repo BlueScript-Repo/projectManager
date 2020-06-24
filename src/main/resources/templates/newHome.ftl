@@ -26,7 +26,6 @@
 
 </head>
 <body class="front-page transparent-header">
-  <div class="scrollToTop circle"><i class="fa fa-angle-up"></i></div>
   <div class="page-wrapper">
     <div class="header-container">
       <div class="header-top dark">
@@ -347,7 +346,9 @@
       var venderName = $('[name="vendorNameStr"]').val();
       $("[name='vendorName']").append("<option value=" + venderName + ">" + venderName + "</option>");
 
-      document.getElementById("textOverlaySearch").style.display = "none";                 
+      document.getElementById("textOverlaySearch").style.display = "none";
+
+      alert('Vender has been added successfully');              
     }
   });
     hideLoading();

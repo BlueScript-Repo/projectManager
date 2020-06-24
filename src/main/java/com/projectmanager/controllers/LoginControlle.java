@@ -41,7 +41,7 @@ public class LoginControlle {
 	@Autowired
 	UserDetailsDao userDetailsDao;
 
-	final static String VIEW = "LandingPage";
+	final static String VIEW = "newLandingPage";
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
@@ -75,7 +75,7 @@ public class LoginControlle {
 			// view = "Home";
 			view = "newHome";
 		} else {
-			view = "LandingPage";
+			view = VIEW;
 
 		}
 
@@ -107,7 +107,7 @@ public class LoginControlle {
 		boolean validLogin = false;
 		String validPassword = loginInfoDao.gePasswordToValidate(new LoginInfo(loginInfo.getUserName(), ""));
 
-		if (validPassword.equalsIgnoreCase(loginInfo.getPassword())) {
+		if (validPassword.equals(loginInfo.getPassword())) {
 			validLogin = true;
 		}
 		return validLogin;

@@ -31,7 +31,10 @@ public class LoginInfoDao {
 
 		Iterator itr = results.iterator();
 
-		loginInfo = (LoginInfo) itr.next();
+		while(itr.hasNext())
+		{
+			loginInfo = (LoginInfo) itr.next();
+		}
 
 		return loginInfo.getPassword();
 	}

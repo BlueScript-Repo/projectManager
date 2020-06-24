@@ -318,7 +318,8 @@ public class BOQController {
 			String[] baseErectionRate, String[] baseSupplyRate, String[] accessoryName, String[] desc1, String[] desc2,
 			String[] desc3, String[] desc4, String[] desc5, String[] model, String[] materialVal, String[] typeVal,
 			String[] pressureRatings, String[] endVal, String isOffer, String[] client, String[] site, String[] project,
-			String[] dName, String[] utility, String[] pressure, String[] temp, String[] dNo, String[] sheetDetails,
+			String[] dName, String[] utility, String[] pressure, String[] temperature, String[] dNo, String[] sheetDetails,
+							   String[] paymentTerms,
 			String venderName, RedirectAttributes redirectAttributes, HttpServletResponse response, HttpSession session)
 			throws IOException {
 		StringBuilder sheetdetailsStr = new StringBuilder();
@@ -337,12 +338,13 @@ public class BOQController {
 		BOQHeader header = new BOQHeader(projectId, inventoryUtils.blankIfNull(client, accessIndex),
 				inventoryUtils.blankIfNull(site, accessIndex), inventoryUtils.blankIfNull(project, accessIndex),
 				inventoryUtils.blankIfNull(dName, accessIndex), inventoryUtils.blankIfNull(utility, accessIndex),
-				inventoryUtils.blankIfNull(pressure, accessIndex), inventoryUtils.blankIfNull(temp, accessIndex),
-				inventoryUtils.blankIfNull(dNo, accessIndex), boqName, sheetdetailsStr.toString());
+				inventoryUtils.blankIfNull(pressure, accessIndex), inventoryUtils.blankIfNull(temperature, accessIndex),
+				inventoryUtils.blankIfNull(dNo, accessIndex), boqName, sheetdetailsStr.toString(),
+				inventoryUtils.blankIfNull(paymentTerms, accessIndex));
 
 		System.out.println("Sheet Details are : " + header.getSheetDetails());
-		ArrayList<String> boqRevisions = boqDao.getMatchingBOQNames(boqName + "_R", projectId);
 
+		ArrayList<String> boqRevisions = boqDao.getMatchingBOQNames(boqName + "_R", projectId);
 		ArrayList<String> quorationRevisions = boqDao.getMatchingBOQNames("Inquiry_" + boqName + "_R", projectId);
 
 		String boqNameRevisionStr = "";
@@ -378,27 +380,6 @@ public class BOQController {
 		System.out.println("Saving BOQ with name : " + boqNameRevisionStr);
 
 		ArrayList<BOQLineData> boqInventoryDetails = new ArrayList<BOQLineData>();
-
-		/*
-		 * String[] sheetDetailsArray = header.getSheetDetails().split(",");
-		 * 
-		 * int noOfEntries = material.length;
-		 * 
-		 * for (int i = 0; i < noOfEntries; i++) {
-		 * System.out.println("Getting details for : " + material[i] + " , " +
-		 * type[i] + " , " + classOrGrade[i] + " , " + ends[i]);
-		 * 
-		 * if (material[i] != null && !material[i].trim().equals("")) {
-		 * BOQLineData boqLineData = new BOQLineData(); try { boqLineData =
-		 * getBOQLineData(material[i].trim(), type[i].trim(),
-		 * classOrGrade[i].trim(), ends[i].trim(), inventoryName[i].trim()); }
-		 * catch (IndexOutOfBoundsException ex) {
-		 * 
-		 * // If you are here it means we are dealing with Accessory boqLineData
-		 * = new BOQLineData(material[i], type[i], manifMetod[i],
-		 * classOrGrade[i], ends[i], "", inventoryName[i], ""); }
-		 * boqInventoryDetails.add(boqLineData); } }
-		 */
 
 		if (material != null) {
 			boqInventoryDetails = getBOQLineDataList(material, type, ends, classOrGrade, inventoryName, manifMetod);

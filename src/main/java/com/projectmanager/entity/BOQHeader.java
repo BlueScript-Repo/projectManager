@@ -1,9 +1,6 @@
 package com.projectmanager.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import com.projectmanager.interfaces.BOQData;
 
@@ -26,12 +23,15 @@ public class BOQHeader implements BOQData {
 	private String dNo;
 	private String sheetDetails;
 
+	@Column(columnDefinition = "TEXT")
+	private String paymentTerms;
+
 	public BOQHeader() {
 
 	}
 
 	public BOQHeader(String projectId, String client, String site, String project, String dName, String utility, String pressure,
-			String temp, String dNo, String boqName, String sheetDetails) {
+			String temp, String dNo, String boqName, String sheetDetails, String paymentTerms) {
 		super();
 		this.projectId = projectId;
 		this.boqName = boqName;
@@ -44,6 +44,7 @@ public class BOQHeader implements BOQData {
 		this.temp = temp;
 		this.dNo = dNo;
 		this.sheetDetails = sheetDetails;
+		this.paymentTerms = paymentTerms;
 	}
 
 	public int getId() {
@@ -140,6 +141,14 @@ public class BOQHeader implements BOQData {
 
 	public void setSheetDetails(String sheetDetails) {
 		this.sheetDetails = sheetDetails;
+	}
+
+	public String getPaymentTerms() {
+		return paymentTerms;
+	}
+
+	public void setPaymentTerms(String paymentTerms) {
+		this.paymentTerms = paymentTerms;
 	}
 
 	@Override

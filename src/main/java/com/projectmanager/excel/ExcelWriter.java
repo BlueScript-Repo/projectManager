@@ -559,6 +559,40 @@ public class ExcelWriter {
 			evaluator1.evaluateFormulaCell(cover.getRow(26).getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
 			evaluator1.evaluateFormulaCell(cover.getRow(27).getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
 
+
+			String[] termsSplited = (header.getPaymentTerms()).split("\r\n");
+
+			StringBuilder forSupply = new StringBuilder();
+			StringBuilder forLabor = new StringBuilder();
+
+			int laborTermIndex = 0;
+			int supplyTermIndex = 0;
+			boolean islabor = false;
+			for(int i=0; i < termsSplited.length;i++)
+			{
+				if("FOR LABOR:".equalsIgnoreCase(termsSplited[i].trim()))
+				{
+					islabor = true;
+				}
+
+				if(islabor)
+				{
+					forLabor.append(termsSplited[i]+"\r\n");
+					cover.getRow(42+laborTermIndex).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(termsSplited[i]);
+					laborTermIndex++;
+				}
+				else
+				{
+					forSupply.append(termsSplited[i]+"\r\n");
+					cover.getRow(38+supplyTermIndex).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(termsSplited[i]);
+					supplyTermIndex++;
+				}
+
+			}
+
+
+
+
 			workBook.removeSheetAt(2);
 		}
 

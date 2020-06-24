@@ -85,7 +85,8 @@ public class ProjectController {
 	@Autowired
 	ExcelReader reader;
 
-	private static final String updateProjectviewName = "updatedDetails";
+	// private static final String updateProjectviewName = "updatedDetails";
+	private static final String updateProjectviewName = "newUpdatedDetails";
 	private static final String searchProjectviewName = "searchProjectResult";
 
 	@RequestMapping(value = "/createProject", method = RequestMethod.POST)
@@ -181,6 +182,8 @@ public class ProjectController {
 			projectList = projectDao.getProject("projevtDesc", projevtDesc);
 		else if (null != companyName && companyName != "")
 			projectList = projectDao.getProject("companyName", companyName);
+		else
+			projectList = projectDao.getProject("projectName", "");
 
 		ModelAndView mav = new ModelAndView(searchProjectviewName);
 
@@ -473,6 +476,7 @@ public class ProjectController {
 	@RequestMapping(value = "/updatePaymentDetails", method = { RequestMethod.POST, RequestMethod.POST })
 	protected @ResponseBody String updatePaymentDetails(String taxInvoiceNumber, String receivedAmount,
 			String paymentMode, String projectId) {
+		double totalAmount = 0.0;
 		try {
 			List<PaymentDetails> paymentDetailsList = paymentDetailsDao.getPayentDetails(taxInvoiceNumber, projectId);
 			PaymentDetails payDetails = null;
@@ -481,7 +485,7 @@ public class ProjectController {
 			ArrayList<TaxInvoiceDetails> taxinvoiceDetailsList = taxInvoiceDao.getTaxIvoiceData("taxInvoiceNo",
 					taxInvoiceNumber);
 
-			double totalAmount = Double.parseDouble(taxinvoiceDetailsList.get(0).getTotal());
+			totalAmount = Double.parseDouble(taxinvoiceDetailsList.get(0).getTotal());
 			totalAmount = totalAmount + Double.parseDouble(taxinvoiceDetailsList.get(0).getcGst()) * 2;
 
 			if (taxinvoiceDetailsList.get(0).getMiscCharges() != null) {
@@ -510,7 +514,7 @@ public class ProjectController {
 			ex.printStackTrace();
 			return "Failure";
 		}
-		return "totalAmount";
+		return String.valueOf(totalAmount);
 	}
 
 	private String getTaxInvoiceNames(int projectId) {
