@@ -1,5 +1,7 @@
 package com.projectmanager.dao;
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -39,5 +41,21 @@ public class UserDetailsDao {
 
 		}
 		return false;
+	}
+	
+	@Transactional
+	public UserDetails isUserPresent(String userName){
+		UserDetails ispresent = null;
+		Session session = sessionFactory.getCurrentSession();
+		try{
+		String Select = "from UserDetails where userName=:userName";
+		Query query = session.createQuery(Select);
+		query.setParameter("userName", userName);
+		ispresent = (UserDetails)query.getSingleResult();
+		}catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		return ispresent;
 	}
 }
