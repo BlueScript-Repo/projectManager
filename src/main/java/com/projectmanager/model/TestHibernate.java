@@ -1,11 +1,14 @@
 package com.projectmanager.model;
 
+import com.itextpdf.text.FontFactory;
+import com.projectmanager.util.InventoryUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 import com.projectmanager.entity.Project;
+import org.springframework.util.ResourceUtils;
 
 public class TestHibernate {
 
@@ -13,7 +16,7 @@ public class TestHibernate {
 
 	public static void main(String[] args) {
 		try {
-			Configuration configuration = new Configuration();
+/*			Configuration configuration = new Configuration();
 			configuration.addAnnotatedClass(com.projectmanager.entity.Project.class);
 			
 			sessionFactory = configuration.configure().buildSessionFactory();
@@ -23,7 +26,10 @@ public class TestHibernate {
 
 			int projId = new TestHibernate().addProject(proj);
 			
-			System.out.println("Added a projet with Id : "+projId);
+			System.out.println("Added a projet with Id : "+projId);*/
+
+			FontFactory.register(ResourceUtils.getFile("classpath:static/fonts/bank_gothic_light_bt.ttf").getAbsolutePath(),"Bank_Gothic");
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

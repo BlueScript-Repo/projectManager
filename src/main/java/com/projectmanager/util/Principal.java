@@ -6,16 +6,11 @@ import java.io.FileOutputStream;
 
 import javax.annotation.ManagedBean;
 
+import com.itextpdf.text.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ResourceUtils;
 
 import com.projectmanager.entity.TaxInvoiceDetails;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -31,6 +26,16 @@ public class Principal {
 	public boolean createInvoice(TaxInvoiceDetails taxInvoiceDetails) {
 
 		try {
+
+			FontFactory.register(ResourceUtils.getFile("classpath:static/fonts/BankGothicRegular.ttf").getAbsolutePath(),"Bank_Gothic");
+			/*Font bankGothicFamily = FontFactory.getFont("Bank_Gothic", "Cp1253", true);*/
+
+			Font blackBGLBi14 = FontFactory.getFont("Bank_Gothic", 14, Font.BOLD, BaseColor.BLACK);
+			Font blackBGLB9 = FontFactory.getFont("Bank_Gothic", 9, Font.NORMAL, BaseColor.BLACK);
+			Font blackBGLB10 = FontFactory.getFont("Bank_Gothic", 10, Font.NORMAL,	BaseColor.BLACK);
+			Font blackBGLB11 = FontFactory.getFont("Bank_Gothic", 11, Font.NORMAL,	BaseColor.BLACK);
+			Font boldBlackBGLB11 = FontFactory.getFont("Bank_Gothic", 11, Font.BOLD,BaseColor.BLACK);
+			Font boldBlackBGLB10 = FontFactory.getFont("Bank_Gothic", 10, Font.BOLD,BaseColor.BLACK);
 			
 			String taxInvoiceNo = taxInvoiceDetails.getInvoiceNo().replace("/", "_");
 			String destination = System.getProperty("java.io.tmpdir") + "/"+taxInvoiceNo+".pdf";
@@ -98,7 +103,7 @@ public class Principal {
 			srnoCell.setFixedHeight(250);
 			table3.addCell(srnoCell);
 			table3.addCell(createNewCell(new Paragraph(taxInvoiceDetails.getHsnOrSac(), blackBGLB11)));
-			table3.addCell(createNewCell(new Paragraph("structural steel erection services as per attached annexure", blackBGLB11)));
+			table3.addCell(createNewCell(new Paragraph("structural steel erection services as per attached annexture", blackBGLB11)));
 			table3.addCell(createNewCell(new Paragraph("1       		", blackBGLB11)));
 			table3.addCell(createNewCell(new Paragraph(taxInvoiceDetails.getRate(), blackBGLB11)));
 			table3.addCell(createNewCell(new Paragraph("Nos			", blackBGLB11)));
@@ -132,14 +137,30 @@ public class Principal {
 
 			table4.addCell(createNewCell(new Paragraph("sub total:", boldBlackBGLB11)));
 			table4.addCell(createNewCell(new Paragraph(taxInvoiceDetails.getRate(), blackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("cgst 9%	 ", boldBlackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph(
-					String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100), blackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("SGST 9%	 ", boldBlackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph(
-					String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100), blackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("IGST 18%	 ", boldBlackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+
+			if(taxInvoiceDetails.getGstNo().startsWith("27"))
+			{
+				table4.addCell(createNewCell(new Paragraph("cgst 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph(
+						String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100), blackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("SGST 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph(
+						String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100), blackBGLB11)));
+
+				table4.addCell(createNewCell(new Paragraph("IGST 18%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+			}
+			else
+			{
+				table4.addCell(createNewCell(new Paragraph("cgst 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("SGST 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+
+				table4.addCell(createNewCell(new Paragraph("IGST 18%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph(String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 18 / 100), blackBGLB11)));
+			}
+
 			table4.addCell(createNewCell(new Paragraph("total	 ", boldBlackBGLB11)));
 			table4.addCell(
 					createNewCell(new Paragraph(
@@ -227,7 +248,7 @@ public class Principal {
 			table5.addCell(createNewCell(new Paragraph("STAMP ", boldBlackBGLB11)));
 
 			try {
-				File file = ResourceUtils.getFile("classpath:background.png");
+				File file = ResourceUtils.getFile("classpath:background.jpg");
 				// init array with file length
 				byte[] bytesArray = new byte[(int) file.length()];
 
@@ -287,16 +308,4 @@ public class Principal {
 		return createNewCell(new Paragraph());
 	}
 
-	public static final Font blackBGLBi14 = new Font(Font.getFamily("BankGothic Lt BT Light"), 14, Font.BOLD,
-			BaseColor.BLACK);
-	public static final Font blackBGLB9 = new Font(Font.getFamily("BankGothic Lt BT Light"), 9, Font.NORMAL,
-			BaseColor.BLACK);
-	public static final Font blackBGLB10 = new Font(Font.getFamily("BankGothic Lt BT Light"), 10, Font.NORMAL,
-			BaseColor.BLACK);
-	public static final Font blackBGLB11 = new Font(Font.getFamily("BankGothic Lt BT Light"), 11, Font.NORMAL,
-			BaseColor.BLACK);
-	public static final Font boldBlackBGLB11 = new Font(Font.getFamily("BankGothic Lt BT Light"), 11, Font.BOLD,
-			BaseColor.BLACK);
-	public static final Font boldBlackBGLB10 = new Font(Font.getFamily("BankGothic Lt BT Light"), 10, Font.BOLD,
-			BaseColor.BLACK);
 }

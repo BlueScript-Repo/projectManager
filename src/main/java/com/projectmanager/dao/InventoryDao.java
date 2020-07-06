@@ -43,12 +43,13 @@ public class InventoryDao {
 		Session session = sessionFactory.getCurrentSession();
 					
 			try
-			{				
+			{
+				System.out.println("inventoryRowId is : "+inventory.getInventoryRowId());
 				session.update(inventory);
 			}
 			catch(Exception updateHibernateException)
 			{
-				System.out.println("Update faled too.");
+				System.out.println("Update failed.");
 				updateHibernateException.printStackTrace();
 			}
 		return inventory.getInventoryRowId();
@@ -166,6 +167,8 @@ public class InventoryDao {
 		
 		try {
 			session = sessionFactory.openSession();
+
+			System.out.println("InventoryRowId selection SQL is : "+selectHql);
 			Query query = session.createQuery(selectHql);
 
 			associatedRowId = query.uniqueResult() != null ? (int) query.uniqueResult() : 0;

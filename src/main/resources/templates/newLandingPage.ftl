@@ -16,7 +16,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="./css/landing.css" />
-    <title>BOOTSTRAP</title>
+    <title>Hamdule Industries</title>
   </head>
 
   <body data-spy="scroll" data-target="#main-nav" id="home">

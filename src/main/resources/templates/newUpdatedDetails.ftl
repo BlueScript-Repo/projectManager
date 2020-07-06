@@ -101,7 +101,7 @@
       <div class="row">
         <div class="col-md-7" >
           <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-            <h3>${projectName}</h3>
+            <h3 id="projectName" >${projectName}</h3>
             <div class="separator clearfix"></div>
             <p>${projectDesc}</p>
           </div>
@@ -133,26 +133,26 @@
     </div>
     <div class="container" style="max-width:98%;">
       <div class="border border-dark rounded-top">
-       <ul class="nav nav-tabs style-1" role="tablist">
-        <li class="nav-item">
-          <a class="nav-link active show" href="#vtab1" role="tab" data-toggle="tab" aria-selected="true"><i class="fa fa-magic pr-2"></i> Project Details</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="createProjectModal1" href="#vtab2" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>BOQ Section</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="createProjectModal2" href="#vtab3" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>Inquries Section</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="createProjectModal3" href="#vtab4" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>PO Section</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#vtab5" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>Invoice Section</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#vtab6" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>Inventory Section</a>
-        </li>
-      </ul>
+          <ul class="nav nav-tabs style-1" role="tablist">
+              <li class="nav-item" style="${showProjectDetails}">
+                  <a class="nav-link active show" href="#vtab1" role="tab" data-toggle="tab" aria-selected="true"><i class="fa fa-magic pr-2"></i> Project Details</a>
+              </li>
+              <li class="nav-item" style="${showBOQSection}">
+                  <a class="nav-link" id="createProjectModal1" href="#vtab2" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>BOQ Section</a>
+              </li>
+              <li class="nav-item" style="${showInquirySection}">
+                  <a class="nav-link" id="createProjectModal2" href="#vtab3" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>Inquries Section</a>
+              </li>
+              <li class="nav-item" style="${showPOSection}">
+                  <a class="nav-link" id="createProjectModal3" href="#vtab4" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>PO Section</a>
+              </li>
+              <li class="nav-item" style="${showInvoiceSection}">
+                  <a class="nav-link" href="#vtab5" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>Invoice Section</a>
+              </li>
+              <li class="nav-item" style="${showInventorySection}">
+                  <a class="nav-link" href="#vtab6" role="tab" data-toggle="tab" aria-selected="false"><i class="fa fa-life-saver pr-2"></i>Inventory Section</a>
+              </li>
+          </ul>
       <div class="tab-content" style="width:98%;">
        <div class="tab-pane fade active show" id="vtab1" role="tabpanel">
         <form action="updateProject" class="projDetails" method="POST">
@@ -248,19 +248,44 @@
     <div class="separator object-non-visible mt-10 animated object-visible fadeIn" data-animation-effect="fadeIn" data-effect-delay="100"></div>
   </div>
 </div>
-<form name="generateBOQ" action="generateNew" class="createBOQ" method="POST" style="display: none;">
+<form name="generateBOQ" action="generateNew" class="createBOQ" method="POST" style="display: none;">  
   <div class="row" style="margin-left: 8%;">
-    <div class="col-md-3 col-sm-3" >
+    <div class="col-md-3 col-sm-3">
      <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-      <label>Doc Name</label>
-      <input type="text" name="dName" class="form-control" value="" required>
+      <label>Client</label>
+      <input type="text" name="client" class="form-control" value="${clientName}" required>
     </div>
   </div>
   <div class="col-md-3 col-sm-3">
    <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-    <label>Utility</label>
-    <input type="text" name="utility" class="form-control" value="" required>
+    <label>Site</label>
+    <input type="text" name="site" class="form-control" value="" required>
   </div>
+</div>
+<div class="col-md-3 col-sm-3">
+  <label class="createBOQ" style="margin-top: 1%; display: none;">BOQ Name : </label>
+  <input class="createBOQ form-control" style="display: none;" type="text" id="boqName" name="boqName" value="" project="" required>
+  <input type="hidden" name="projectId" value="${projectId}"/>
+</div> 
+<div class="col-md-3 col-sm-3">
+ <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
+  <label>Utility</label>
+  <input type="text" name="utility" class="form-control" value="${utility}" required>
+</div>
+</div>   
+</div>
+<div class="row" style="margin-left: 8%;margin-top: 1%;">
+  <div class="col-md-3 col-sm-3" >
+   <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
+    <label>Doc Name</label>
+    <input type="text" name="dName" class="form-control" value="" required>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3">
+ <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
+  <label>Doc Number</label>
+  <input type="text" class="form-control" name="dNo" value="" required>
+</div>
 </div>
 <div class="col-md-3 col-sm-3">
  <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
@@ -273,32 +298,7 @@
   <label>Temperature</label>
   <input type="text" name="temperature" class="form-control" value="" required>
 </div>
-</div>
-</div>
-<div class="row" style="margin-left: 8%;margin-top: 1%;">
-  <div class="col-md-3 col-sm-3">
-   <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-    <label>Doc Number</label>
-    <input type="text" class="form-control" name="dNo" value="" required>
-  </div>
-</div>
-<div class="col-md-3 col-sm-3">
- <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-  <label>Client</label>
-  <input type="text" name="client" class="form-control" value="${clientName}" required>
-</div>
-</div>
-<div class="col-md-3 col-sm-3">
- <div class="animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-  <label>Site</label>
-  <input type="text" name="site" class="form-control" value="" required>
-</div>
-</div>
-<div class="col-md-3 col-sm-3">
-  <label class="createBOQ" style="margin-top: 1%; display: none;">BOQ Name : </label>
-  <input class="createBOQ form-control" style="display: none;" type="text" id="boqName" name="boqName" value="" project="" required>
-  <input type="hidden" name="projectId" value="${projectId}"/>
-</div>  
+</div> 
 </div>
 <div class="row" style="margin-left: 8%;margin-top: 1%;">
   <div class="col-md-6">
@@ -1445,7 +1445,7 @@
 
        var headerHTML = $.parseHTML(headerDetails);
 
-       for(var k=0;k<headerHTML.length-2;k++)
+       for(var k=0;k<headerHTML.length-1;k++)
        {
         var ele = headerHTML[k];
         var val = headerHTML[k].value;
@@ -2627,6 +2627,16 @@ function cleanArray(actual)
   {
     console.log(thisObj.parent().parent().remove());
   }
+</script>
+<script type="text/javascript">
+
+  $('[name="selectedVenderName"]').on('change', function(e){
+
+    var projName = $('#projectName')[0].innerHTML;
+    var venderName = $('[name="selectedVenderName"]').children("option:selected").val();
+    $('[name="inquiryName"]').attr('value',"Inquiry_"+venderName.replace(/ /g, "_")+"_"+projName.replace(/ /g, "_"));
+  });
+
 </script>
 </body>
 </html>

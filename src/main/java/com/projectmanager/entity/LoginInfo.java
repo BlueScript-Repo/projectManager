@@ -10,10 +10,15 @@ public class LoginInfo {
 
 	private String password;
 
-	public LoginInfo(String userName, String password) {
+	private String role;
+
+
+
+	public LoginInfo(String userName, String password, String role) {
 		super();
 		this.userName = userName;
 		this.password = password;
+		this.role = role;
 	}
 
 	public LoginInfo() {
@@ -36,4 +41,11 @@ public class LoginInfo {
 		this.password = password;
 	}
 
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 }

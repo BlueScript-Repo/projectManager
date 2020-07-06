@@ -160,6 +160,17 @@ public class InventoryController {
 
 		String clientShortName = "";
 
+		//Calclate number of sub-challan need to be reated
+
+        int noOfChallan = Math.round(inventorySpec.size()/14) + 1;
+
+        ArrayList<StringBuffer> lineItemDataList = new ArrayList<>();
+
+        for(int k=0;k<=noOfChallan-2;k++)
+        {
+            lineItemDataList.add(new StringBuffer());
+        }
+
 		for (int i = 0; i < inventorySpec.size(); i++) {
 			Inventory inventory = new Inventory();
 			inventory.setInventorySpec(inventorySpec.get(i));
@@ -312,7 +323,27 @@ public class InventoryController {
 					gradeOrClass[i], manifMethod[i], ends[i], size[i]);
 			String lineItem = getInventoryDetailsRow(String.valueOf(i + 1), size[i], description,
 					String.valueOf(quantity[i]), "NB");
-			lineItemData.append(lineItem);
+			if(i<14)
+            {
+                lineItemData.append(lineItem);
+            }
+            else
+            {
+                int challanToGoTo = Math.round(i/14);
+
+                StringBuffer stringBufferItem = lineItemDataList.get(challanToGoTo-1);
+				stringBufferItem.append(lineItem);
+
+				lineItemDataList.add(challanToGoTo, stringBufferItem);
+
+				if(lineItemDataList.size()>challanToGoTo+1)
+				{
+					lineItemDataList.remove(challanToGoTo+1);
+				}
+
+
+            }
+
 
 			inventory.setInventoryRowId(inventoryRowId);
 			receivedInventoryList.add(inventory);
@@ -342,11 +373,16 @@ public class InventoryController {
 
 			String totalAmount = getTotalAmount(purchaseRate, quantity);
 
+			taxInvoiceDetails.setRate(totalAmount);
+
 			// Add if any miscellaneous charges are included
 
 			String miscCharges = taxInvoiceDetails.getMiscCharges();
 
-			double totalAmountInt = Double.parseDouble(totalAmount);
+			String totalInvoiceAmount = createAnnexture(String.valueOf(projectId), material, type, ends, gradeOrClass, inventoryName, manifMethod,
+					size, quantity, invoiceNo, taxInvoiceDetails.getInvoiceType());
+
+			double totalAmountInt = Double.parseDouble(totalInvoiceAmount);
 			if (miscCharges != null && !("".equals(miscCharges))) {
 				totalAmountInt = totalAmountInt + Double.parseDouble(miscCharges);
 			}
@@ -360,8 +396,6 @@ public class InventoryController {
 
 			String amountsToWord = numberWordConverter.convert((int) Math.round(doubleVal));
 
-			taxInvoiceDetails.setRate(totalAmount);
-
 			if (amountsToWord.length() > 40) {
 				taxInvoiceDetails.setAmtInwrd1((String) amountsToWord.substring(0, 39));
 				taxInvoiceDetails.setAmtInwrd2((String) amountsToWord.substring(40));
@@ -370,10 +404,9 @@ public class InventoryController {
 				taxInvoiceDetails.setAmtInwrd2("");
 			}
 
+			taxInvoiceDetails.setTotal(totalInvoiceAmount);
 			String sender = userDetailsDao.getEmailAddress((String) session.getAttribute("userName"));
 
-			createAnnexture(String.valueOf(projectId), material, type, ends, gradeOrClass, inventoryName, manifMethod,
-					size, quantity, invoiceNo);
 			taxInvoiceGenerator.generateAndSendTaxInvoice(taxInvoiceDetails, sender);
 
 			try {
@@ -396,9 +429,20 @@ public class InventoryController {
 			}
 		}
 
-		view.addObject("itemList", lineItemData);
-		view.addObject("challanNo", challanDetails.getInventoryRowId());
-		view.addObject("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		String subChallanHTML = inventoryUtils.getChallanHTML(noOfChallan-1, challanDetails, lineItemDataList);
+
+		view.addObject("moreChallanPages", subChallanHTML);
+
+		view.addObject("itemList", lineItemData.toString().replaceAll("~",""));
+		view.addObject("challanNo", challanDetails.getInventoryRowId()+" - "+"1/"+noOfChallan);
+
+		for(int l =1;l<noOfChallan;l++)
+        {
+            view.addObject("itemList"+l, lineItemDataList.get(l-1).toString().replaceAll("~",""));
+            view.addObject("challanNo"+l, challanDetails.getInventoryRowId()+" - "+l+1+"/"+noOfChallan);
+        }
+
+		view.addObject("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yy")));
 		view.addObject("consignee1", challanDetails.getConsignee());
 		view.addObject("consignee2", "");
 		view.addObject("consignee3", "");
@@ -482,7 +526,7 @@ public class InventoryController {
 		String sender = userDetailsDao.getEmailAddress((String) session.getAttribute("userName"));
 
 		String totalInvoiceAmount = createAnnexture(String.valueOf(projectId), material, type, ends, classOrGrade,
-				inventoryName, manifMetod, size, receivedQuantity, invoiceNo);
+				inventoryName, manifMetod, size, receivedQuantity, invoiceNo, taxInvoiceDetails.getInvoiceType());
 
 		taxInvoiceDetails.setTotal(totalInvoiceAmount);
 
@@ -509,7 +553,7 @@ public class InventoryController {
 
 				Inventory inventory = new Inventory(
 						new InventorySpec(inventoryName[i], material[i], type[i], manifMetod[i], classOrGrade[i],
-								ends[i], size[i], projectName, "assigned"),
+								ends[i], size[i], projectName, "consumed"),
 						purchaseRate[i], receivedQuantity[i], location[i], "", "");
 
 				try {
@@ -683,7 +727,7 @@ public class InventoryController {
 
 	protected String createAnnexture(String projectId, String[] materialIn, String[] typeIn, String[] endsIn,
 			String[] classOrGradeIn, String[] inventoryNameIn, String[] manifMetodIn, String[] sizeIn, int billedQty[],
-			String invoiceNo) {
+			String invoiceNo, String invoiceType) {
 
 		invoiceNo = invoiceNo.replace("/", "_");
 		String destination = System.getProperty("java.io.tmpdir") + "/" + invoiceNo + "_Annexture.xls";
@@ -756,7 +800,7 @@ public class InventoryController {
 		boqlineData = boqController.getBOQLineDataList(material, type, ends, classOrGrade, inventoryName, manifMetod);
 		try {
 			excelByts = writer.writeExcel(boqlineData, size, quantity, supplyRate, erectionRate, supplyAmount,
-					erectionAmount, "", header, false);
+					erectionAmount, "", header, false, true);
 
 			FileOutputStream fOut = new FileOutputStream(new File(destination));
 
@@ -769,7 +813,21 @@ public class InventoryController {
 			e.printStackTrace();
 		}
 
-		return String.valueOf(erectionAmountTotal + supplyAmountTotal);
+
+		if("Supply".equalsIgnoreCase(invoiceType))
+		{
+			return String.valueOf(supplyAmountTotal);
+		}
+		else if("Labour".equalsIgnoreCase(invoiceType))
+		{
+			return String.valueOf(erectionAmountTotal);
+		}
+		else if("Supply&Labour".equalsIgnoreCase(invoiceType))
+		{
+			return String.valueOf(erectionAmountTotal + supplyAmountTotal);
+		}
+
+		return "";
 
 	}
 }

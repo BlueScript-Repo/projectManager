@@ -293,7 +293,7 @@ public class BOQController {
 		boqlineData = getBOQLineDataList(material, type, ends, classOrGrade, inventoryName, manifMetod);
 		try {
 			excelByts = writer.writeExcel(boqlineData, size, quantity, supplyRate, erectionRate, supplyAmount,
-					erectionAmount, "", header, false);
+					erectionAmount, "", header, false, false);
 			response.setHeader("Content-disposition", "attachment; filename=" + docNameToDownload + ".xls");
 
 			OutputStream out = response.getOutputStream();
@@ -394,7 +394,7 @@ public class BOQController {
 				erectionAmount = new String[] {};
 			}
 			excelByts = writer.writeExcel(boqInventoryDetails, size, quantity, supplyRate, erectionRate, supplyAmount,
-					erectionAmount, boqNameRevisionStr, header, Boolean.valueOf(isOffer));
+					erectionAmount, boqNameRevisionStr, header, Boolean.valueOf(isOffer), false);
 
 			ArrayList<BOQDetails> boqInventoryDetailsList = new ArrayList<BOQDetails>();
 			if (inventoryName != null) {
@@ -872,7 +872,7 @@ public class BOQController {
 				+ "<input type=\"hidden\" name=\"dName\" 		id=\"iDdName\" 	value=\"dNameVal\" />"
 				+ "<input type=\"hidden\" name=\"utility\" 	id=\"iDutility\" 	value=\"utilityVal\" />"
 				+ "<input type=\"hidden\" name=\"pressure\" 	id=\"iDpressure\" value=\"pressureVal\" />"
-				+ "<input type=\"hidden\" name=\"temp\" 		id=\"iDtemp\" 	value=\"tempVal\" />"
+				+ "<input type=\"hidden\" name=\"temperature\" 		id=\"iDtemp\" 	value=\"tempVal\" />"
 				+ "<input type=\"hidden\" name=\"dNo\" 		id=\"iDdNo\" 		value=\"dNoVal\" />"
 				+ "<input type=\"hidden\" name=\"sheetDetails\" value=\"sheetDetailsVal\" />";
 

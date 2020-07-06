@@ -7,20 +7,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.itextpdf.text.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.view.AbstractView;
 
 import com.projectmanager.entity.TaxInvoiceDetails;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.FontFactory;
 
 @Component("taxInvoiceView")
 public class TaxInvoicePDFView extends AbstractView {
@@ -41,6 +37,16 @@ public class TaxInvoicePDFView extends AbstractView {
 	public void createInvoice(HttpServletResponse response, TaxInvoiceDetails taxInvoiceDetails) {
 
 		try {
+
+			FontFactory.register(ResourceUtils.getFile("classpath:static/fonts/BankGothicRegular.ttf").getAbsolutePath(),"Bank_Gothic");
+			/*Font bankGothicFamily = FontFactory.getFont("Bank_Gothic", "Cp1253", true);*/
+
+			Font blackBGLBi14 = FontFactory.getFont("Bank_Gothic", 14, Font.BOLD, BaseColor.BLACK);
+			Font blackBGLB9 = FontFactory.getFont("Bank_Gothic", 9, Font.NORMAL, BaseColor.BLACK);
+			Font blackBGLB10 = FontFactory.getFont("Bank_Gothic", 10, Font.NORMAL,	BaseColor.BLACK);
+			Font blackBGLB11 = FontFactory.getFont("Bank_Gothic", 11, Font.NORMAL,	BaseColor.BLACK);
+			Font boldBlackBGLB11 = FontFactory.getFont("Bank_Gothic", 11, Font.BOLD,BaseColor.BLACK);
+			Font boldBlackBGLB10 = FontFactory.getFont("Bank_Gothic", 10, Font.BOLD,BaseColor.BLACK);
 
 			Document document = new Document();
 
@@ -234,7 +240,7 @@ public class TaxInvoicePDFView extends AbstractView {
 			table5.addCell(createNewCell(new Paragraph("STAMP ", boldBlackBGLB11)));
 
 			try {
-				File file = ResourceUtils.getFile("classpath:background.png");
+				File file = ResourceUtils.getFile("classpath:background.jpg");
 				// init array with file length
 				byte[] bytesArray = new byte[(int) file.length()];
 
@@ -291,17 +297,4 @@ public class TaxInvoicePDFView extends AbstractView {
 	protected PdfPCell createNewCell() {
 		return createNewCell(new Paragraph());
 	}
-
-	public static final Font blackBGLBi14 = new Font(Font.getFamily("BankGothic Lt BT Light"), 14, Font.BOLD,
-			BaseColor.BLACK);
-	public static final Font blackBGLB9 = new Font(Font.getFamily("BankGothic Lt BT Light"), 9, Font.NORMAL,
-			BaseColor.BLACK);
-	public static final Font blackBGLB10 = new Font(Font.getFamily("BankGothic Lt BT Light"), 10, Font.NORMAL,
-			BaseColor.BLACK);
-	public static final Font blackBGLB11 = new Font(Font.getFamily("BankGothic Lt BT Light"), 11, Font.NORMAL,
-			BaseColor.BLACK);
-	public static final Font boldBlackBGLB11 = new Font(Font.getFamily("BankGothic Lt BT Light"), 11, Font.BOLD,
-			BaseColor.BLACK);
-	public static final Font boldBlackBGLB10 = new Font(Font.getFamily("BankGothic Lt BT Light"), 10, Font.BOLD,
-			BaseColor.BLACK);
 }

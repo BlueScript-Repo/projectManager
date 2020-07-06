@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.projectmanager.dao.*;
+import com.projectmanager.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,27 +19,11 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.projectmanager.dao.AccessoryDetailsDao;
-import com.projectmanager.dao.BOQDetailsDao;
-import com.projectmanager.dao.InventoryDao;
-import com.projectmanager.dao.MappingsDao;
-import com.projectmanager.dao.PODetailsDao;
-import com.projectmanager.dao.PaymentDetailsDao;
-import com.projectmanager.dao.ProjectDao;
-import com.projectmanager.dao.ProjectDetailsDao;
-import com.projectmanager.dao.TaxInvoiceDetailsDao;
-import com.projectmanager.dao.ValvesDao;
-import com.projectmanager.dao.VendorDetailsDao;
-import com.projectmanager.entity.BOQDetails;
-import com.projectmanager.entity.Inventory;
-import com.projectmanager.entity.PaymentDetails;
-import com.projectmanager.entity.Project;
-import com.projectmanager.entity.ProjectDetails;
-import com.projectmanager.entity.TaxInvoiceDetails;
-import com.projectmanager.entity.VendorDetails;
 import com.projectmanager.excel.ExcelReader;
 import com.projectmanager.model.FilePojo;
 import com.projectmanager.util.InventoryUtils;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @EnableWebMvc
@@ -76,6 +62,9 @@ public class ProjectController {
 
 	@Autowired
 	VendorDetailsDao vendorDetailsDao;
+
+	@Autowired
+	LoginInfoDao loginInfoDao;
 
 	@Autowired
 	InventoryUtils inventoryUtils;
@@ -120,38 +109,7 @@ public class ProjectController {
 		mav.addObject("projectName", project.getProjectName());
 		mav.addObject("projectDesc", project.getProjectDesc());
 		return mav;
-		
-		/*ModelAndView mav = new ModelAndView(updateProjectviewName);
 
-		mav.addObject("boqNameList", String.join(",", ""));
-		mav.addObject("quotationNamesList", String.join(",", ""));
-		mav.addObject("projectName", project.getProjectName());
-		mav.addObject("projectDesc", project.getProjectDesc());
-		mav.addObject("projectId", project.getProjectId());
-		mav.addObject("taxInvoiceNamesList", "");
-		mav.addObject("poNamesList", "");
-		mav.addObject("projectId", project.getProjectId());
-		mav.addObject("projectName", project.getProjectName());
-		mav.addObject("projectDesc", project.getProjectDesc());
-		mav.addObject("items", items.toString());
-		mav.addObject("address", "");
-		mav.addObject("contactEmail", "");
-		mav.addObject("contactName", "");
-		mav.addObject("contactPhone", "");
-		mav.addObject("gstNumber", "");
-		mav.addObject("poDate", "");
-		mav.addObject("poNumber", "");
-		mav.addObject("assignedInventory", "");
-		mav.addObject("assignedAccessory", "");
-		mav.addObject("paymentDetails", "");
-
-		mav.addObject("consumedInventory", "");
-		mav.addObject("consumedAccessory", "");
-
-		mav.addObject("assignedInventory", "");
-		mav.addObject("assignedAccessory", "");
-
-		return mav;*/
 	}
 
 	@RequestMapping(value = "/updateProject", method = RequestMethod.POST)
@@ -206,7 +164,14 @@ public class ProjectController {
 	}
 
 	@RequestMapping(value = "/projectDetails", method = { RequestMethod.POST, RequestMethod.GET })
-	protected ModelAndView projectDetails(Project project, RedirectAttributes redirectAttributes) throws Exception {
+	protected ModelAndView projectDetails(Project project, RedirectAttributes redirectAttributes, HttpSession session) throws Exception
+	{
+
+		String userName = (String) session.getAttribute("userName");
+
+		LoginInfo loginInfo = loginInfoDao.getLoginInfo(userName);
+
+		String role = loginInfo.getRole();
 
 		String projectId = String.valueOf(project.getProjectId());
 
@@ -250,30 +215,7 @@ public class ProjectController {
 			assignedInventoryStr.append(inventoryUtils.createInventoryRowTable(inv, false) + projectDetalsHTML);
 		}
 
-		// Assigned accessories
-		/*
-		 * ArrayList<AccessoryDetails> assignedAccessory = accessoryDetailsDao
-		 * .getAccessoryDetailsByStatus(project.getProjectName(), "assigned");
-		 */
-
-		/*
-		 * StringBuffer assignedAccessoryStr = new StringBuffer();
-		 * 
-		 * for (AccessoryDetails accessory : assignedAccessory) {
-		 * assignedAccessoryStr.append(inventoryUtils.createAccessoryRowTable(
-		 * accessory, false) + projectDetalsHTML); }
-		 */
-
-		// ArrayList<Valves> assignedValves =
-		// valveDetailsDao.getValveDetailsByStatus(project.getProjectName(),"assigned");
-
 		StringBuffer assignedValveStr = new StringBuffer();
-
-		/*
-		 * for (Valves valveDetails : assignedValves) {
-		 * assignedValveStr.append(inventoryUtils.createAccessoryRowTable(
-		 * valveDetails, true)+projectDetalsHTML); }
-		 */
 
 		ModelAndView mav = new ModelAndView(updateProjectviewName);
 
@@ -285,15 +227,6 @@ public class ProjectController {
 			consumedInventoryStr.append(inventoryUtils.createInventoryRowTable(inv, true) + projectDetalsHTML);
 		}
 
-		/*
-		 * ArrayList<AccessoryDetails> consumedAccessory = accessoryDetailsDao
-		 * .getAccessoryDetailsByStatus(project.getProjectName(), "consumed");
-		 * StringBuffer consumedAccessoryStr = new StringBuffer();
-		 * 
-		 * for (AccessoryDetails accessory : consumedAccessory) {
-		 * consumedAccessoryStr.append(inventoryUtils.createAccessoryRowTable(
-		 * accessory, true) + projectDetalsHTML); }
-		 */
 		StringBuilder items = new StringBuilder();
 
 		ArrayList<String> inventoryList = (ArrayList<String>) mappingsDao.getAssociatedOptions("null", "null",
@@ -378,12 +311,48 @@ public class ProjectController {
 		project = projectDao.getProject(Integer.parseInt(projectId));
 
 		mav.addObject("clientName", project.getCompanyName() == null ? "" : project.getCompanyName());
+		mav.addObject("utility", project.getProjectDesc() == null ? "" : project.getProjectDesc());
 
 		mav.addObject("emailAddress", projectDetails.getContactEmail() == null ? "" : projectDetails.getContactEmail());
 		mav.addObject("addressedTo", projectDetails.getAddress() == null ? "" : projectDetails.getAddress());
 		mav.addObject("mobileNo", projectDetails.getContactPhone() == null ? "" : projectDetails.getContactPhone());
 		mav.addObject("contactName", projectDetails.getContactName() == null ? "" : projectDetails.getContactName());
 
+		switch (role)
+		{
+			case "Admin":
+				System.out.println("User role is Admin");
+				mav.addObject("showProjectDetails",";");
+				mav.addObject("showBOQSection","");
+				mav.addObject("showInquirySection","");
+				mav.addObject("showPOSection","");
+				mav.addObject("showInvoiceSection","");
+				mav.addObject("showInventorySection","");
+				break;
+			case "Accounts": System.out.println("User role is Accounts");
+				mav.addObject("showProjectDetails","display:none;");
+				mav.addObject("showBOQSection","display:none;");
+				mav.addObject("showInquirySection","display:none;");
+				mav.addObject("showPOSection","");
+				mav.addObject("showInvoiceSection","");
+				mav.addObject("showInventorySection","");
+				break;
+			case "Engineer": System.out.println("");
+				mav.addObject("showProjectDetails","display:none;");
+				mav.addObject("showBOQSection","display:none;");
+				mav.addObject("showInquirySection","display:none;");
+				mav.addObject("showPOSection","display:none;");
+				mav.addObject("showInvoiceSection","display:none;");
+				mav.addObject("showInventorySection","");
+				break;
+			default:
+				mav.addObject("showProjectDetails","display:none;");
+				mav.addObject("showBOQSection","display:none;");
+				mav.addObject("showInquirySection","display:none;");
+				mav.addObject("showPOSection","display:none;");
+				mav.addObject("showInvoiceSection","display:none;");
+				mav.addObject("showInventorySection","display:none;");
+		}
 		return mav;
 	}
 

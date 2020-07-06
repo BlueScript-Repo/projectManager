@@ -110,8 +110,9 @@ public class PurchaseOrderPDFView extends AbstractView {
 			// Row2
 			PdfPCell c3 = createNewCell();
 
-			c3.addElement(new Paragraph("VAT TIN no.   " + vatTin, blackCalibri10));
+
 			c3.addElement(new Paragraph("GST No.   " + gstNo, blackCalibri10));
+			c3.addElement(new Paragraph("          ", blackCalibri10));
 
 			c3.setBorderWidthBottom(0);
 			c3.setBorderColorBottom(null);

@@ -43,7 +43,7 @@ public class ExcelWriter {
 
 	public byte[] writeExcel(ArrayList<BOQLineData> boqLineDataDetails, String[] size, String[] quantity,
 			String[] supplyRate, String[] erectionRate, String[] supplyAmount, String[] erectionAmount,
-			String boqNameRevisionStr, BOQHeader header, boolean isOffer) throws IOException {
+			String boqNameRevisionStr, BOQHeader header, boolean isOffer, boolean isInvoiceAnnexture) throws IOException {
 
 		Workbook workBook = null;
 		FileInputStream inputStream = null;
@@ -162,7 +162,9 @@ public class ExcelWriter {
 		whiteBackGroundBaseLineRight.setBorderRight(BorderStyle.MEDIUM);
 		whiteBackGroundBaseLineRight.setRightBorderColor(IndexedColors.BLACK.index);
 
+
 		for (int s = 1; s <= sheetNames.size(); s++) {
+			int serialNumber = 1;
 			ArrayList<BOQLineData> processedInventory = new ArrayList<BOQLineData>();
 			Sheet sheet = workBook.getSheetAt(s + 2);
 			int inventoryCount = Integer.parseInt(sheetDetailsMap.get(sheetNameList.get(s - 1)));
@@ -171,7 +173,7 @@ public class ExcelWriter {
 					.setCellValue("Hamdule Industries Pvt Ltd");
 
 			sheet.addMergedRegion(new CellRangeAddress(0, 1, 0, 4));
-			// sheet.addMergedRegion(new CellRangeAddress(0,1,5,7));
+			/*sheet.addMergedRegion(new CellRangeAddress(2,2,5,7));*/
 
 			sheet.addMergedRegion(new CellRangeAddress(2, 3, 0, 0));
 			sheet.addMergedRegion(new CellRangeAddress(2, 3, 2, 4));
@@ -224,11 +226,6 @@ public class ExcelWriter {
 				System.out.println("presentIndex is : " + presentIndex);
 
 				if (presentIndex != -1) {
-					// int row = presentIndex * 7 + 9 + i;
-
-					/*
-					 * invRepeateCount ++; isNextInventory = false;
-					 */
 
 					shouldEnd = false;
 					int row = nextRow - 8 + invRepeateCount;
@@ -294,21 +291,9 @@ public class ExcelWriter {
 					rowB4Push = 0;
 					processedInventory.add(inventory);
 
-					/*
-					 * if(invRepeateCount>6) { nextRow = nextRow +
-					 * (inventoryCount-6); }
-					 */
 					sheet.createRow(nextRow - 2);
 					sheet.createRow(nextRow - 1);
 					sheet.createRow(nextRow);
-
-					/*
-					 * if (invIndx != 0) { sheet.createRow(nextRow - 2); for
-					 * (int n = 0; n < 8; n++) { Cell cell0 =
-					 * sheet.getRow(nextRow - 2).getCell(n,
-					 * Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-					 * cell0.setCellStyle(whiteBackGround); } }
-					 */
 
 					for (int n = 0; n < 8; n++) {
 						Cell cell0 = sheet.getRow(nextRow - 2).getCell(n, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
@@ -327,7 +312,7 @@ public class ExcelWriter {
 
 					Cell serialNumberCell = sheet.getRow(nextRow - 1).getCell(0,
 							Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-					serialNumberCell.setCellValue(index + 1);
+					serialNumberCell.setCellValue(serialNumber++);
 
 					String invCategory = null != inventory.getCategory() ? inventory.getCategory() : "";
 					Cell cellToUpdateInv = sheet.getRow(nextRow - 1).getCell(1,
@@ -526,13 +511,43 @@ public class ExcelWriter {
 			for (int j = 0; j < 8; j++) {
 				sheet.autoSizeColumn(j);
 			}
+
+/*			for (int j = 0; j < 8; j++) {*/
+
+			/*}*/
+
+			//If this an Inquiry, we are removing BOQHeader details
+			if(isOffer)
+			{
+				System.out.println("sheet.getNumMergedRegions() is : "+sheet.getNumMergedRegions());
+
+				while (sheet.getNumMergedRegions() > 0) {
+					for (int l = 0; l <= sheet.getNumMergedRegions(); l++) {
+						sheet.removeMergedRegion(l);
+					}
+				}
+
+				sheet.shiftRows(7,sheet.getLastRowNum(),-7,true,true);
+				/*				for(int m=0; m<7;m++)
+				{
+					sheet.removeRow(sheet.getRow(m));
+				}*/
+
+			}
 		}
 
-		if (isOffer) {
+		if(isInvoiceAnnexture)
+		{
+			workBook.removeSheetAt(0);
+		}
+		else if (isOffer)
+		{
 			workBook.removeSheetAt(0);
 			workBook.removeSheetAt(0);
 			workBook.removeSheetAt(0);
-		} else {
+		}
+		else
+		{
 
 			Sheet cover = workBook.getSheetAt(0);
 
@@ -548,6 +563,7 @@ public class ExcelWriter {
 
 			cover.getRow(12).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
 					.setCellValue(cover.getRow(12).getCell(2).getStringCellValue() + header.getClient());
+			cover.getRow(22).getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(header.getUtility());
 
 			FormulaEvaluator evaluator1 = workBook.getCreationHelper().createFormulaEvaluator();
 
@@ -589,9 +605,6 @@ public class ExcelWriter {
 				}
 
 			}
-
-
-
 
 			workBook.removeSheetAt(2);
 		}

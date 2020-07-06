@@ -51,4 +51,21 @@ public class LoginInfoDao {
 		}
 		return false;
 	}
+
+	@Transactional
+	public LoginInfo getLoginInfo(String userName) {
+
+		LoginInfo loginInfo = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+
+			Query query = session.createQuery("from LoginInfo where userName=:userName");
+			query.setParameter("userName", userName);
+
+			loginInfo = (LoginInfo)query.getSingleResult();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return loginInfo;
+	}
 }

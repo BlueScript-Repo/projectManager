@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.amazonaws.services.iot.model.AlertTarget;
 import com.projectmanager.dao.ResetCodeDao;
 import com.projectmanager.dao.UserDetailsDao;
 import com.projectmanager.entity.ResetCode;
-import com.projectmanager.entity.SessionEntry;
 import com.projectmanager.entity.UserDetails;
 import com.projectmanager.util.EmailUtils;
 

@@ -1,18 +1,21 @@
 package com.projectmanager.util;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.ManagedBean;
 
+import com.projectmanager.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.projectmanager.dao.InventoryDao;
 import com.projectmanager.dao.PODetailsDao;
-import com.projectmanager.entity.AccessoryDetails;
-import com.projectmanager.entity.BOQDetails;
-import com.projectmanager.entity.Inventory;
-import com.projectmanager.entity.InventorySpec;
+import org.springframework.util.ResourceUtils;
 
 @ManagedBean
 public class InventoryUtils {
@@ -242,5 +245,62 @@ public class InventoryUtils {
 		}
 
 		return invoiceNamesString.toString();
+	}
+
+	public String getChallanHTML(int noOfChallan, ChallanDetails challanDetails, ArrayList<StringBuffer> lineItemDataList)
+	{
+		String challanHTML = "";
+		StringBuffer challanHTMLBuffer = new StringBuffer();
+
+		try
+		{
+			FileInputStream inputStream = new FileInputStream(ResourceUtils.getFile("classpath:extendedChallan"));
+			String str = "";
+			StringBuffer buf = new StringBuffer();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			if (inputStream != null) {
+				while ((str = reader.readLine()) != null) {
+					buf.append(str + "\n" );
+				}
+			}
+
+			challanHTML = buf.toString();
+
+			for(int i=1;i<=noOfChallan;i++)
+			{
+				String stringToadd = challanHTML;
+
+				stringToadd = stringToadd.replace("challanNo",challanDetails.getInventoryRowId()+" - "+(i+1)+"/"+(noOfChallan+1));
+				stringToadd = stringToadd.replace("itemList",lineItemDataList.get(i-1).toString().replaceAll("~",""));
+
+				stringToadd = stringToadd.replace("poNo",challanDetails.getPoNo());
+				stringToadd = stringToadd.replace("date",LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yy")));
+				stringToadd = stringToadd.replace("poDate",challanDetails.getPoDate());
+				stringToadd = stringToadd.replace("from1",challanDetails.getReceivedFrom());
+				stringToadd = stringToadd.replace("consignee1",challanDetails.getConsignee());
+				stringToadd = stringToadd.replace("from2","");
+				stringToadd = stringToadd.replace("consignee2","");
+				stringToadd = stringToadd.replace("from3","");
+				stringToadd = stringToadd.replace("consignee3","");
+				stringToadd = stringToadd.replace("transportMode",challanDetails.getTransportMode());
+				stringToadd = stringToadd.replace("lrNo",challanDetails.getLrNumberDate());
+				stringToadd = stringToadd.replace("vheicleNumber",challanDetails.getVheicleNumber());
+				stringToadd = stringToadd.replace("gstNo",challanDetails.getGstNo());
+
+
+
+
+
+				challanHTMLBuffer.append(stringToadd);
+			}
+
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		
+		return challanHTMLBuffer.toString();
 	}
 }

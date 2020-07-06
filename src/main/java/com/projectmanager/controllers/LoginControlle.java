@@ -105,7 +105,7 @@ public class LoginControlle {
 
 	private boolean validateLogin(LoginInfo loginInfo) {
 		boolean validLogin = false;
-		String validPassword = loginInfoDao.gePasswordToValidate(new LoginInfo(loginInfo.getUserName(), ""));
+		String validPassword = loginInfoDao.gePasswordToValidate(new LoginInfo(loginInfo.getUserName(), "", ""));
 
 		if (validPassword.equals(loginInfo.getPassword())) {
 			validLogin = true;
@@ -115,7 +115,9 @@ public class LoginControlle {
 
 	@RequestMapping(value = "/logout", method = RequestMethod.POST)
 	protected ModelAndView logout(HttpSession session) {
-		double sessionId = (double) session.getAttribute("sessionId");
+
+
+		String sessionId = String.valueOf(session.getAttribute("sessionId"));
 		boolean sessionDelete = true;
 		String userName = (String) session.getAttribute("userName");
 		sessionDelete = sessionDao.deleteSession(String.valueOf(sessionId));
@@ -129,7 +131,7 @@ public class LoginControlle {
 		boolean userRegistered = userDetailsDao.saveUser(userDetails);
 		if (userRegistered) {
 			loginInfoAdded = loginInfoDao
-					.addLoginInfo(new LoginInfo(userDetails.getUserName(), userDetails.getUserPassword()));
+					.addLoginInfo(new LoginInfo(userDetails.getUserName(), userDetails.getUserPassword(), ""));
 		}
 
 		if (!userRegistered || !loginInfoAdded) {
