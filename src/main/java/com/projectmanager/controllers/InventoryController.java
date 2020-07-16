@@ -3,18 +3,25 @@ package com.projectmanager.controllers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,6 +29,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projectmanager.dao.AccessoryDetailsDao;
 import com.projectmanager.dao.BOQDetailsDao;
 import com.projectmanager.dao.BOQHeaderDao;
@@ -34,6 +45,7 @@ import com.projectmanager.dao.ProjectDetailsDao;
 import com.projectmanager.dao.ReceivedInventoryDao;
 import com.projectmanager.dao.TaxInvoiceDetailsDao;
 import com.projectmanager.dao.UserDetailsDao;
+import com.projectmanager.dao.ValvesDao;
 import com.projectmanager.entity.AccessoryDetails;
 import com.projectmanager.entity.BOQDetails;
 import com.projectmanager.entity.BOQHeader;
@@ -47,7 +59,9 @@ import com.projectmanager.entity.Project;
 import com.projectmanager.entity.ProjectDetails;
 import com.projectmanager.entity.TaxInvoiceDetails;
 import com.projectmanager.entity.TaxInvoiceGenerator;
+import com.projectmanager.entity.Valves;
 import com.projectmanager.excel.ExcelWriter;
+import com.projectmanager.model.InventoryMappingModel;
 import com.projectmanager.util.InventoryUtils;
 import com.projectmanager.util.NumberWordConverter;
 import com.projectmanager.util.PurchaseOrderPDFView;
@@ -95,6 +109,9 @@ public class InventoryController {
 
 	@Autowired
 	MappingsDao mappingsDao;
+	
+	@Autowired
+	ValvesDao valvesDao;
 
 	@Autowired
 	BOQDetailsDao boqDetailsDao;
@@ -109,6 +126,7 @@ public class InventoryController {
 	BOQController boqController;
 
 	private static final String updateViewName = "updateInvPO";
+	
 
 	@RequestMapping(value = "/updateInventoryForm", method = RequestMethod.GET)
 	protected ModelAndView updateInventoryForm() {
@@ -652,6 +670,7 @@ public class InventoryController {
 		}
 		return new ModelAndView("inventoryUpdate").addObject("projectNames", projectNames.toString());
 	}
+	
 
 	@RequestMapping(value = "/getExistingMappings", method = RequestMethod.GET)
 	private @ResponseBody String getExistingMappings() {

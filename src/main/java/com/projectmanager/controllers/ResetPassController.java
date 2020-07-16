@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.amazonaws.services.iot.model.AlertTarget;
 import com.projectmanager.dao.ResetCodeDao;
 import com.projectmanager.dao.UserDetailsDao;
 import com.projectmanager.entity.ResetCode;
@@ -161,7 +160,7 @@ public class ResetPassController {
 
 	public static final String confirmPassword = "<label for=\"confirmPassword\" class=\"col-md-3 text-md-right control-label col-form-label\">Confirm Password</label>"
 			+ "<div class=\"col-md-8\">"
-			+ "<input name =\"password\" type=\"text\" class=\"form-control\" id=\"confirmPassword\" placeholder=\"enter code\" required=\"\">"
+			+ "<input name =\"password\" type=\"text\" class=\"form-control\" id=\"confirmPassword\" placeholder=\"enter confirm Password\" required=\"\">"
 			+ "<i class=\" form-control-feedback pr-4\"></i></div>";
 	public static final String confirmMessage = "<h2 class=\"page-title medium\">"
 			+ "<span class=\"text-default\">Reset Password is done</span></h2>"

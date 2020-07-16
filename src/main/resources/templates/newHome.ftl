@@ -76,7 +76,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-lg-4">
+          <div class="col-lg-3">
             <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible" data-animation-effect="fadeInDownSmall" data-effect-delay="100" data-toggle="modal" data-target="#createProjectModal">
               <span class="icon default-bg circle"><i class="fa fa-diamond"></i></span>
               <h3>Create Project</h3>
@@ -84,7 +84,7 @@
               <p>Create a new project to generate BOQ or Quotation. The project created here can be viewed using <strong>Search project</strong> Option.</p>
             </div>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-3">
             <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible" data-animation-effect="fadeInDownSmall" data-effect-delay="150" data-toggle="modal" data-target="#searchProjectModal">
               <span class="icon default-bg circle"><i class="fa fa-connectdevelop"></i></span>
               <h3>Search Project</h3>
@@ -93,7 +93,7 @@
               <br>
             </div>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-3">
             <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible" data-animation-effect="fadeInDownSmall" data-effect-delay="200" onclick="$('#updateInv').submit();">
               <span class="icon default-bg circle"><i class="fa fa fa-snowflake-o"></i></span>
               <form id="updateInv" action="updateInvPO" method="GET">                
@@ -103,6 +103,17 @@
               <p>Use this link to access Inventory page to update system when Invemtory is received,</p>
             </div>
           </div>
+           <div class="col-lg-3">
+            <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible" data-animation-effect="fadeInDownSmall" data-effect-delay="200" onclick="$('#inventoryDet').submit();">
+              <span class="icon default-bg circle"><i class="fa fa fa-snowflake-o"></i></span>
+              <form id="inventoryDet" action="inventoryDetails" method="GET">                
+                <h3>Inventory Details</h3>
+              </form>
+              <div class="separator clearfix"></div>
+              <p>Use this for update Inventory details.</p>
+            </div>
+          </div>
+          
         </div>
       </div>
     </section>

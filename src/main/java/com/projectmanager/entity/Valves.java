@@ -9,8 +9,8 @@ import javax.persistence.Id;
 public class Valves {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)	
-	private String id;
+	
+	private int id;
 	
 	private String model;
 	private String material;
@@ -27,9 +27,10 @@ public class Valves {
 		
 	}
 	
-	public Valves(String model, String material, String end, String type, String pressureRatings,
+	public Valves(int id, String model, String material, String end, String type, String pressureRatings,
 			String sizeRange, String maxInletPressure, String operation, String seatAndSeals) {
 		super();
+		this.id = id;
 		this.model = model;
 		this.material = material;
 		this.end = end;
@@ -40,10 +41,10 @@ public class Valves {
 		this.operation = operation;
 		this.seatAndSeals = seatAndSeals;
 	}
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getModel() {
