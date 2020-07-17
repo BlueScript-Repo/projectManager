@@ -125,10 +125,11 @@
      	<div class="tab-pane fade" id="htab2" role="tabpanel">                  
           <div class="row">
             <div class="col-md-12">
-              <table class="table table-striped table-colored table-responsive" id="mappingTable">
+              <table class="table table-striped table-colored table-responsive" id="tblValvesDetails">
                <thead>
                 <tr>
                 	<th>#</th>
+                	<th></th>
                 	<th>Model</th>
                 	<th>Material</th>
                 	<th>End</th>
@@ -145,9 +146,9 @@
                  ${valvesDetails}
                </tbody> 
               </table> 
+               <input id="addValvesBtn" type="button" class="btn btn-primary mt-5" value="+" onclick="addRowInValve('tblValvesDetails');changeUpdateValvebtn()">
                <input id="updateValvesBtn" type="submit" class="btn btn-primary mt-5" value="Update">
-               
-               </form>
+                </form>
      		</div>
      	  </div>
      	</div>
@@ -346,25 +347,194 @@ function addRow(tableID) {
 
 <script type="text/javascript">
 
+var lbNewValve = false;
+
   $('#updateValvesBtn').on('click', function(e){
+  
+  var dataArrayToSendContoller = [];
+	
+	
+ $('#tblValvesDetails input:checkbox:checked').each(function() {
+    //for each checked checkbox
+  	 
+if(lbNewValve)
+	{
+		row = $(this).closest("tr");
+
+		var ModelLength = $(row).find("input[name=model]").val().length;
+		if(ModelLength == 0)
+		{
+			alert("Please enter model");
+			return;
+		
+		}
+	}
+
+
+    row = $(this).closest("tr");
+            dataArrayToSendContoller.push({ 
+                item_id 		: $(row).find("input[name=ItemId]").val(),
+                model  			: $(row).find("input[name=model]").val(),
+                material     	: $(row).find("input[name=material]").val(),
+				end     		: $(row).find("input[name=end]").val(),
+                type    	    : $(row).find("input[name=type]").val(),
+                pressureRatings : $(row).find("input[name=pressureRatings]").val(),
+                maxInletPressure: $(row).find("input[name=maxInletPressure]").val(),  
+				operation     	: $(row).find("input[name=operation]").val(),
+                seatAndSeals    : $(row).find("input[name=seatAndSeals]").val(),
+				sizeRange     	: $(row).find("input[name=sizeRange]").val()				
+            });
+
+
+});
+  
 
    e.preventDefault(); 
-
+if(dataArrayToSendContoller.length > 0)
+ {
    var ajaxReq = $.ajax({
      url : 'updateValvesDetails',
      type : 'POST',
-     data : $('#updateValvesDetails').serialize(),
+     data : JSON.stringify(dataArrayToSendContoller),
+     dataType: "json",
+     contentType: "application/json; charset=utf-8",
    // data : $('#updateValvesDetails').clone(true,true).serialize(),
    success: function(data) 
-   {
-    alert("Updated Successfully..!!");
-    console.log(" Received data from BE");
-    console.log(data);  
-             
-  }
-});
+				   {
+				    alert("Updated Successfully..!!");
+				    console.log(" Received data from BE");
+				    console.log(data);  
+				     window.location.reload();                
+				  }
+		});
+	}		
 
  });
+
+
+function changeUpdateValvebtn(){
+
+var btn = document.getElementById("updateValvesBtn");
+if(btn.value === "Update")
+btn.value = "Add";
+lbNewValve = true;
+}
+
+function addRowInValve(tableID) {
+
+
+			var table = document.getElementById(tableID);
+
+			var rowCount = table.rows.length;
+			var row = table.insertRow(rowCount);
+
+			var cell1 = row.insertCell(0);
+			var element1 = document.createElement("input");
+			element1.value = rowCount + 1;
+			element1.type = "text";
+			element1.class = "form-control";
+			element1.name = "ItemId";
+			element1.style = "width:50px";
+			element1.style.height = "40px";
+			cell1.appendChild(element1);
+						
+			var cell2 = row.insertCell(1);
+			var element2 = document.createElement("input");
+			element2.type = "checkbox";
+			element2.class="chkView";
+			element2.checked="true";
+			cell2.appendChild(element2);
+			
+
+			var cell3 = row.insertCell(2);
+			var element3 = document.createElement("input");
+			element3.style.width = "59px";
+			element3.style.height = "40px";
+			element3.type = "text";
+			element3.class = "form-control";
+			element3.name = "model";
+			cell3.appendChild(element3);
+			
+			var cell4 = row.insertCell(3);
+			var element4 = document.createElement("input");
+			element4.style.width = "59px";
+			element4.style.height = "40px";
+			element4.type = "text";
+			element4.class = "form-control";
+			element4.name = "material";
+			cell4.appendChild(element4);
+			
+			var cell5 = row.insertCell(4);
+			var element5 = document.createElement("input");
+			element5.style.width = "59px";
+			element5.style.height = "40px";
+			element5.type = "text";
+			element5.name = "end";
+			element5.class = "form-control";
+			cell5.appendChild(element5);
+
+			var cell6 = row.insertCell(5);
+			var element6 = document.createElement("input");
+			element6.style.width = "59px";
+			element6.style.height = "40px";
+			element6.type = "text";
+			element6.class = "form-control";
+			element6.name = "type";
+			element6.value = "";
+			cell6.appendChild(element6);
+			
+			var cell7 = row.insertCell(6);
+			var element7 = document.createElement("input");
+			element7.style.width = "59px";
+			element7.style.height = "40px";
+			element7.type = "text";
+			element7.class = "form-control";
+			element7.name = "pressureRatings";
+			element7.value = "";
+			cell7.appendChild(element7);
+			
+			var cell8 = row.insertCell(7);
+			var element8 = document.createElement("input");
+			element8.style.width = "59px";
+			element8.style.height = "40px";
+			element8.type = "text";
+			element8.class = "form-control";
+			element8.name = "maxInletPressure";
+			element8.value = "";
+			cell8.appendChild(element8);
+			
+			var cell9 = row.insertCell(8);
+			var element9 = document.createElement("input");
+			element9.style.width = "59px";
+			element9.style.height = "40px";
+			element9.type = "text";
+			element9.class = "form-control";
+			element9.name = "operation";
+			element9.value = "";
+			cell9.appendChild(element9);
+			
+			var cell10 = row.insertCell(9);
+			var element10 = document.createElement("input");
+			element10.style.width = "59px";
+			element10.style.height = "40px";
+			element10.type = "text";
+			element10.class = "form-control";
+			element10.name = "seatAndSeals";
+			element10.value = "";
+			cell10.appendChild(element10);
+			
+			var cell11 = row.insertCell(10);
+			var element11 = document.createElement("input");
+			element11.style.width = "59px";
+			element11.style.height = "40px";
+			element11.type = "text";
+			element11.class = "form-control";
+			element11.name = "sizeRange";
+			element11.value = "";
+			cell11.appendChild(element11);
+
+
+		} 
 
 </script>
 
@@ -394,9 +564,6 @@ $('#tblMappingDetails').on('change', '.chkView[type=checkbox]', function(event) 
 
 </script>
 
-<script>
-
-</script>
 
 </body>
 </html>

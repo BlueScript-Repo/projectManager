@@ -24,6 +24,7 @@ import com.projectmanager.dao.ValvesDao;
 import com.projectmanager.entity.Mappings;
 import com.projectmanager.entity.Valves;
 import com.projectmanager.model.InventoryMappingModel;
+import com.projectmanager.model.InventoryValveModel;
 
 @Controller
 @EnableWebMvc
@@ -88,7 +89,8 @@ public class AddInventoryController {
 		int index2 = 1;
 		for(Valves valves : valvesData){
 			valvesDetails.append("<tr>");
-			valvesDetails.append("<td>" + index2 + "</td>");
+			valvesDetails.append("<td><input type='text' style='width:50px' class='form-control' value='" + index2 + "' name='ItemId'  ></td>");
+			valvesDetails.append("<td><input type='checkbox' class='chkView' ></td>");
 			valvesDetails.append("<td><input type='text'  class='form-control' value='" + valves.getModel() + "' name='model' ></td>");
 			valvesDetails.append("<td><input type='text'  class='form-control' value='" + valves.getMaterial() + "' name='material' ></td>");
 			valvesDetails.append("<td><input type='text'  class='form-control' value='" + valves.getEnd() + "' name='end' ></td>");
@@ -483,9 +485,37 @@ public class AddInventoryController {
 	}
 	
 */	
+	@RequestMapping(value = "updateValvesDetails", method = RequestMethod.POST)
+	public @ResponseBody String updateValvesDetails(@RequestBody String dataArrayToSendContoller) throws UnsupportedEncodingException, JsonMappingException, JsonProcessingException{
+		
+		
+		String decodedJson = java.net.URLDecoder.decode(dataArrayToSendContoller, "UTF-8");
+	      ObjectMapper jacksonObjectMapper = new ObjectMapper(); // This is Jackson
+	      List<InventoryValveModel> userRolesGUIBeans =  jacksonObjectMapper.readValue(decodedJson, new TypeReference<List<InventoryValveModel>>(){});
+	      
+	      for(InventoryValveModel inventoryValve :userRolesGUIBeans){
+	    	 String itemid =  inventoryValve.getItemId();
+	    	 String Model = inventoryValve.getModel();
+	    	 String Material = inventoryValve.getMaterial();
+	    	 String End = inventoryValve.getEnd();
+	    	 String Type = inventoryValve.getType();
+	    	 String PressureRatings = inventoryValve.getPressureRatings();
+	    	 String SizeRange = inventoryValve.getSizeRange();
+	    	 String MaxInletPressure = inventoryValve.getMaxInletPressure();
+	    	 String Operation = inventoryValve.getOperation();
+	    	 String SeatAndSeals = inventoryValve.getSeatAndSeals();
+	    	 int itemInt = Integer.parseInt(itemid);
+	    	 Valves valves = new Valves(itemInt, Model, Material, End, Type, PressureRatings, SizeRange, MaxInletPressure, Operation, SeatAndSeals);
+				valvesDao.updateValves(valves);
+	      }
+
+		System.out.println(userRolesGUIBeans);
+		
+		return "true";
+	}
 	
 
-	@RequestMapping(value = "updateValvesDetails", method = RequestMethod.POST)
+	/*@RequestMapping(value = "updateValvesDetails", method = RequestMethod.POST)
 	public @ResponseBody String updateValvesDetails(String[] model, String[] material, String[] end, String[] type, String[] pressureRatings,
 			String[] sizeRange, String[] maxInletPressure, String[] operation, String[] seatAndSeals){
 		for(int i = 0; i < model.length; i++){
@@ -494,6 +524,6 @@ public class AddInventoryController {
 		}
 		
 		return "true";
-	}
+	}*/
 	
 }
