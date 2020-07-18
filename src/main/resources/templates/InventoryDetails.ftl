@@ -92,6 +92,9 @@
         <li class="nav-item">
           <a class="nav-link" href="#htab2" role="tab" data-toggle="tab"><i class="fa fa-user pr-2"></i>Valves</a>
         </li>
+           <li class="nav-item">
+          <a class="nav-link" href="#htab3" role="tab" data-toggle="tab"><i class="fa fa-user pr-2"></i>Taxes</a>
+        </li>
         </ul>
         <div class="tab-content">
         <div class="tab-pane fade show active" id="htab1" role="tabpanel">                  
@@ -153,6 +156,19 @@
      	  </div>
      	</div>
      	
+     	<div class="tab-pane fade " id="htab3" role="tabpanel">                  
+          <div class="row">
+            <div class="col-md-12">
+              
+               <form id="updateTaxesDetails" action="updateTaxesDetails" method="POST">
+               ${taxesDetails}
+              
+              <input id="updateTaxesBtn" type="submit" class="btn btn-primary mt-5" value="Update">
+          </form>
+				
+     		</div>
+     	  </div>
+     	</div>
      	</div>	  		
   	</div>
   </div>
@@ -564,6 +580,27 @@ $('#tblMappingDetails').on('change', '.chkView[type=checkbox]', function(event) 
 
 </script>
 
+<script>
+$('#updateTaxesBtn').on('click', function(e){
 
+   e.preventDefault(); 
+
+   var ajaxReq = $.ajax({
+     url : 'updateTaxesDetails',
+     type : 'POST',
+     data : $('#updateTaxesDetails').serialize(),
+  
+   success: function(data) 
+   {
+    alert("Updated Successfully..!!");
+    console.log(" Received data from BE");
+    console.log(data);  
+    location.reload(); 
+             
+  }
+});
+
+ });
+</script>
 </body>
 </html>

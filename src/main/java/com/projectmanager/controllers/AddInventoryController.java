@@ -20,8 +20,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projectmanager.dao.MappingsDao;
+import com.projectmanager.dao.TaxesDao;
 import com.projectmanager.dao.ValvesDao;
 import com.projectmanager.entity.Mappings;
+import com.projectmanager.entity.TaxesEntity;
 import com.projectmanager.entity.Valves;
 import com.projectmanager.model.InventoryMappingModel;
 import com.projectmanager.model.InventoryValveModel;
@@ -35,10 +37,15 @@ public class AddInventoryController {
 	
 	@Autowired
 	ValvesDao valvesDao;
+	
+	@Autowired
+	TaxesDao taxesDao;
 
 	@RequestMapping(value = "/inventoryDetails", method = RequestMethod.GET)
 	private ModelAndView inventoryDetails(){
 		ModelAndView modelAndView = new ModelAndView();
+		
+		
 		//take mapping details  from db for loop 
 		ArrayList<String> inventoryList = mappingsDao.getAllInventory();
 		System.out.println(inventoryList);
@@ -104,9 +111,21 @@ public class AddInventoryController {
 			index2++;
 		}
 
+		ArrayList<TaxesEntity> taxesData = taxesDao.getTaxesDetails();
+		
+		StringBuffer taxesDetails = new StringBuffer();
+		
+		for (TaxesEntity taxes : taxesData){
+			taxesDetails.append("<label style='font-weight: bold; padding-right: 20px;'>CGST :</label> <input type='text' id='cGst' name='cGst' value='" + taxes.getcGst()+ "' style='text-align:center; height: 40px;width: 70px;'><br><br>");
+			taxesDetails.append("<label style='font-weight: bold; padding-right: 20px;'>SGST :</label> <input type='text' id='sGst' name='sGst' value='" + taxes.getsGst()+ "' style='text-align:center; height: 40px;width: 70px;'><br><br>");
+			taxesDetails.append("<label style='font-weight: bold; padding-right: 25px;'>IGST :</label> <input type='text' id='iGst' name='iGst' value='" + taxes.getiGst()+ "' style='text-align:center; height: 40px;width: 70px;'><br><br>");
+			
+		}
+		
 		modelAndView.setViewName("inventoryDetails");
 		modelAndView.addObject("mappingDetails", mappingDetails.toString());
 		modelAndView.addObject("valvesDetails", valvesDetails.toString());
+		modelAndView.addObject("taxesDetails", taxesDetails.toString());
 		return modelAndView;
 	}
 	
@@ -515,15 +534,15 @@ public class AddInventoryController {
 	}
 	
 
-	/*@RequestMapping(value = "updateValvesDetails", method = RequestMethod.POST)
-	public @ResponseBody String updateValvesDetails(String[] model, String[] material, String[] end, String[] type, String[] pressureRatings,
-			String[] sizeRange, String[] maxInletPressure, String[] operation, String[] seatAndSeals){
-		for(int i = 0; i < model.length; i++){
-			Valves valves = new Valves(i+1, model[i], material[i], end[i], type[i], pressureRatings[i], sizeRange[i], maxInletPressure[i], operation[i], seatAndSeals[i]);
-			valvesDao.updateValves(valves);
-		}
+	@RequestMapping(value = "updateTaxesDetails", method = RequestMethod.POST)
+	public @ResponseBody String updateTaxesDetails(int cGst, int sGst, int iGst){
+	
+			//TaxesEntity taxes = new TaxesEntity();
+		
+			taxesDao.updateTaxes(cGst, sGst, iGst);
+
 		
 		return "true";
-	}*/
+	}
 	
 }
