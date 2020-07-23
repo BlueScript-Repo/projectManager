@@ -9,41 +9,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.projectmanager.entity.Mappings;
-import com.projectmanager.entity.Valves;
+import com.projectmanager.entity.TaxesEntity;
+
 
 @Repository
-public class ValvesDao {
+public class TaxesDao {
+	
 	@Autowired
 	SessionFactory sessionFactory;
 	
 	@Transactional
-	public ArrayList<Valves> getValveDetails()
+	public ArrayList<TaxesEntity> getTaxesDetails()
 	{
 		Session session = sessionFactory.getCurrentSession();
 		
-		String sqlStr = "From Valves";
+		String sqlStr = "From TaxesEntity";
 		
 		Query query = session.createQuery(sqlStr);
 		
-		ArrayList<Valves> valveDetailsList = (ArrayList<Valves>) query.getResultList();
+	ArrayList<TaxesEntity> result  =(ArrayList<TaxesEntity>) query.getResultList();
 		
-		return valveDetailsList;
+		return result;
 	}
-	
+
 	@Transactional
-	public boolean updateValves(Valves valves) {
-	
+	public boolean updateTaxes(int cGst, int sGst, int iGst) {
 		boolean result = true;
 		try {
 			Session session = sessionFactory.getCurrentSession();
-			session.saveOrUpdate(valves);
+			String sqlStr = "update TaxesEntity set cGSt=:cGst, sGSt=:sGst, iGst=:iGst";
+			Query query = session.createQuery(sqlStr);
+			query.setParameter("cGst", cGst);
+			query.setParameter("sGst", sGst);
+			query.setParameter("iGst", iGst);
+
+			query.executeUpdate();
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			result = false;
 		}
 	return result;	
+		
 	}
-
+	
 
 }

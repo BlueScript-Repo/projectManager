@@ -12,7 +12,6 @@ import javax.persistence.Table;
 public class Mappings {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int Id;
 	
 	@Column
@@ -30,6 +29,21 @@ public class Mappings {
 	@Column
 	private String catogory;
 	
+	
+	
+	public Mappings() {
+		
+	}
+	public Mappings(int id, String inventoryName, String material, String type,
+			String classOrGrade, String catogory) {
+		super();
+		Id = id;
+		this.inventoryName = inventoryName;
+		this.material = material;
+		this.type = type;
+		this.classOrGrade = classOrGrade;
+		this.catogory = catogory;
+	}
 	public int getId() {
 		return Id;
 	}
