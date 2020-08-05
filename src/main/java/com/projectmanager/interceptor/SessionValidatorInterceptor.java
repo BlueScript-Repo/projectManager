@@ -26,6 +26,10 @@ public class SessionValidatorInterceptor extends HandlerInterceptorAdapter {
 		String sessionId = String.valueOf(session.getAttribute("sessionId"));
 		String userName = (String) session.getAttribute("userName");
 
+		if(null==userName)
+		{
+			return false;
+		}
 		// Call sessionDao to check if the sesssion exists in DB or not
 		SessionEntry sessionEntry = new SessionEntry();
 		sessionEntry.setSessionId(sessionId);

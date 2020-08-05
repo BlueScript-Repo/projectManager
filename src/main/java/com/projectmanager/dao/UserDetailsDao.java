@@ -31,6 +31,20 @@ public class UserDetailsDao {
 	}
 
 	@Transactional
+	public UserDetails getuSerDetails(String userName) {
+		UserDetails userDetails = null;
+		String queryString = "from UserDetails where userName=:userName";
+
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createQuery(queryString);
+		query.setParameter("userName", userName == null ? "" : userName);
+
+		userDetails = (UserDetails) query.getSingleResult();
+
+		return userDetails;
+	}
+
+	@Transactional
 	public boolean saveUser(UserDetails userDetails) {
 		try {
 			Session session = sessionFactory.getCurrentSession();

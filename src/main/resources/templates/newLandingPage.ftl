@@ -23,7 +23,7 @@
 
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top" id="main-nav">
         <div class="container">
-            <img src="./images/img/Hamdule-logo1.png" alt="" class="navbar-brand">
+            <img src="./images/img/Hamdule-Logo1.png" alt="" class="navbar-brand">
         </div>
     </nav>
 
@@ -87,7 +87,7 @@
                     </button>
                 </div>
                 <div class="separator clearfix"></div>
-                <p><a class="text-white" href="resetPassword">Forgot Password?</a></p>
+                <p><a class="text-white" href="reset">Forgot Password?</a></p>
                   </form>
                 </div>
               </div>

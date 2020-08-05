@@ -3,25 +3,20 @@ package com.projectmanager.controllers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import com.projectmanager.dao.*;
+import com.projectmanager.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,23 +24,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projectmanager.dao.AccessoryDetailsDao;
-import com.projectmanager.dao.BOQDetailsDao;
-import com.projectmanager.dao.BOQHeaderDao;
-import com.projectmanager.dao.BillDetailsDao;
-import com.projectmanager.dao.ChallanDao;
-import com.projectmanager.dao.InventoryDao;
-import com.projectmanager.dao.MappingsDao;
-import com.projectmanager.dao.ProjectDao;
-import com.projectmanager.dao.ProjectDetailsDao;
-import com.projectmanager.dao.ReceivedInventoryDao;
-import com.projectmanager.dao.TaxInvoiceDetailsDao;
-import com.projectmanager.dao.UserDetailsDao;
-import com.projectmanager.dao.ValvesDao;
 import com.projectmanager.entity.AccessoryDetails;
 import com.projectmanager.entity.BOQDetails;
 import com.projectmanager.entity.BOQHeader;
@@ -59,13 +37,9 @@ import com.projectmanager.entity.Project;
 import com.projectmanager.entity.ProjectDetails;
 import com.projectmanager.entity.TaxInvoiceDetails;
 import com.projectmanager.entity.TaxInvoiceGenerator;
-import com.projectmanager.entity.Valves;
 import com.projectmanager.excel.ExcelWriter;
-import com.projectmanager.model.InventoryMappingModel;
 import com.projectmanager.util.InventoryUtils;
 import com.projectmanager.util.NumberWordConverter;
-import com.projectmanager.util.PurchaseOrderPDFView;
-
 
 @Controller
 @EnableWebMvc
@@ -109,7 +83,7 @@ public class InventoryController {
 
 	@Autowired
 	MappingsDao mappingsDao;
-	
+
 	@Autowired
 	ValvesDao valvesDao;
 
@@ -125,8 +99,11 @@ public class InventoryController {
 	@Autowired
 	BOQController boqController;
 
+	@Autowired
+	TaxesDao taxesDao;
+
 	private static final String updateViewName = "updateInvPO";
-	
+
 
 	@RequestMapping(value = "/updateInventoryForm", method = RequestMethod.GET)
 	protected ModelAndView updateInventoryForm() {
@@ -381,7 +358,7 @@ public class InventoryController {
 				lastNo = Integer.parseInt(lasttaxInvoiceNo.substring(lasttaxInvoiceNo.lastIndexOf("/") + 1));
 			}
 
-			invoiceNo = "Invoice/" + clientShortName + "/" + String.valueOf(lastNo + 1);
+			invoiceNo = "Invoice/" + clientShortName.replaceAll(" ","_") + "/" + String.valueOf(lastNo + 1);
 			taxInvoiceDetails.setInvoiceNo(invoiceNo);
 			taxInvoiceDetails.setTaxInvoiceNo(invoiceNo);
 
@@ -391,22 +368,23 @@ public class InventoryController {
 
 			String totalAmount = getTotalAmount(purchaseRate, quantity);
 
-			taxInvoiceDetails.setRate(totalAmount);
-
 			// Add if any miscellaneous charges are included
-
 			String miscCharges = taxInvoiceDetails.getMiscCharges();
 
+			String userName = (String) session.getAttribute("userName");
+
 			String totalInvoiceAmount = createAnnexture(String.valueOf(projectId), material, type, ends, gradeOrClass, inventoryName, manifMethod,
-					size, quantity, invoiceNo, taxInvoiceDetails.getInvoiceType());
+					size, quantity, invoiceNo, taxInvoiceDetails.getInvoiceType(), userName);
 
 			double totalAmountInt = Double.parseDouble(totalInvoiceAmount);
 			if (miscCharges != null && !("".equals(miscCharges))) {
 				totalAmountInt = totalAmountInt + Double.parseDouble(miscCharges);
 			}
 
-			double cGST = totalAmountInt * 9 / 100;
-			double sGST = totalAmountInt * 9 / 100;
+			TaxesEntity taxes = taxesDao.getTaxesDetails().get(0);
+
+			double cGST = totalAmountInt * taxes.getcGst() / 100;
+			double sGST = totalAmountInt * taxes.getsGst() / 100;
 
 			taxInvoiceDetails.setcGst(String.valueOf(cGST));
 
@@ -421,11 +399,12 @@ public class InventoryController {
 				taxInvoiceDetails.setAmtInwrd1(amountsToWord);
 				taxInvoiceDetails.setAmtInwrd2("");
 			}
-
+			taxInvoiceDetails.setRate(totalInvoiceAmount);
 			taxInvoiceDetails.setTotal(totalInvoiceAmount);
-			String sender = userDetailsDao.getEmailAddress((String) session.getAttribute("userName"));
 
-			taxInvoiceGenerator.generateAndSendTaxInvoice(taxInvoiceDetails, sender);
+			String sender = userDetailsDao.getEmailAddress(userName);
+
+			taxInvoiceGenerator.generateAndSendTaxInvoice(taxInvoiceDetails, sender, userName);
 
 			try {
 				for (int i = 0; i < receivedInventoryList.size(); i++) {
@@ -447,7 +426,10 @@ public class InventoryController {
 			}
 		}
 
-		String subChallanHTML = inventoryUtils.getChallanHTML(noOfChallan-1, challanDetails, lineItemDataList);
+		String userName = (String)session.getAttribute("userName");
+		UserDetails userDetails = userDetailsDao.getuSerDetails(userName);
+
+		String subChallanHTML = inventoryUtils.getChallanHTML(noOfChallan-1, challanDetails, lineItemDataList, userDetails);
 
 		view.addObject("moreChallanPages", subChallanHTML);
 
@@ -460,12 +442,14 @@ public class InventoryController {
             view.addObject("challanNo"+l, challanDetails.getInventoryRowId()+" - "+l+1+"/"+noOfChallan);
         }
 
+
+
 		view.addObject("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yy")));
 		view.addObject("consignee1", challanDetails.getConsignee());
 		view.addObject("consignee2", "");
 		view.addObject("consignee3", "");
-		view.addObject("from1", challanDetails.getReceivedFrom());
-		view.addObject("from2", "");
+		view.addObject("from1", userDetails.getFirstName() + " " + userDetails.getLastName());
+		view.addObject("from2", challanDetails.getReceivedFrom());
 		view.addObject("from3", "");
 		view.addObject("gstNo", challanDetails.getGstNo());
 		view.addObject("lrNo", challanDetails.getLrNumberDate());
@@ -516,7 +500,7 @@ public class InventoryController {
 
 		ProjectDetails projectDetails = projectDetailsDao.getProjectDetails(projectId);
 
-		String invoiceNo = "Invoice/" + clientShortName + "/" + String.valueOf(lastNo + 1);
+		String invoiceNo = "Invoice/" + clientShortName.replaceAll(" ","_") + "/" + String.valueOf(lastNo + 1);
 		taxInvoiceDetails.setInvoiceNo(invoiceNo);
 		taxInvoiceDetails.setTaxInvoiceNo(invoiceNo);
 		taxInvoiceDetails.setOrderNo(projectDetails.getPoNumber());
@@ -541,15 +525,19 @@ public class InventoryController {
 
 		taxInvoiceDetails.setRate(totalAmount);
 
-		String sender = userDetailsDao.getEmailAddress((String) session.getAttribute("userName"));
+		String userName = (String) session.getAttribute("userName");
+		String sender = userDetailsDao.getEmailAddress(userName);
 
 		String totalInvoiceAmount = createAnnexture(String.valueOf(projectId), material, type, ends, classOrGrade,
-				inventoryName, manifMetod, size, receivedQuantity, invoiceNo, taxInvoiceDetails.getInvoiceType());
+				inventoryName, manifMetod, size, receivedQuantity, invoiceNo, taxInvoiceDetails.getInvoiceType(), userName);
 
+		taxInvoiceDetails.setRate(totalInvoiceAmount);
 		taxInvoiceDetails.setTotal(totalInvoiceAmount);
 
-		double cGST = Double.parseDouble(totalInvoiceAmount) * 9 / 100;
-		double sGST = Double.parseDouble(totalInvoiceAmount) * 9 / 100;
+		TaxesEntity taxes = taxesDao.getTaxesDetails().get(0);
+
+		double cGST = Double.parseDouble(totalInvoiceAmount) * taxes.getcGst() / 100;
+		double sGST = Double.parseDouble(totalInvoiceAmount) * taxes.getsGst() / 100;
 
 		Double doubleVal = Double.parseDouble(totalInvoiceAmount) + cGST + sGST;
 
@@ -563,7 +551,7 @@ public class InventoryController {
 		}
 
 		taxInvoiceDetails.setcGst(String.valueOf(cGST));
-		taxInvoiceGenerator.generateAndSendTaxInvoice(taxInvoiceDetails, sender);
+		taxInvoiceGenerator.generateAndSendTaxInvoice(taxInvoiceDetails, sender, userName);
 
 		try {
 
@@ -714,7 +702,7 @@ public class InventoryController {
 		}
 		return new ModelAndView("inventoryUpdate").addObject("projectNames", projectNames.toString());
 	}
-	
+
 
 	@RequestMapping(value = "/getExistingMappings", method = RequestMethod.GET)
 	private @ResponseBody String getExistingMappings() {
@@ -746,10 +734,10 @@ public class InventoryController {
 
 	protected String createAnnexture(String projectId, String[] materialIn, String[] typeIn, String[] endsIn,
 			String[] classOrGradeIn, String[] inventoryNameIn, String[] manifMetodIn, String[] sizeIn, int billedQty[],
-			String invoiceNo, String invoiceType) {
+			String invoiceNo, String invoiceType, String userName) {
 
 		invoiceNo = invoiceNo.replace("/", "_");
-		String destination = System.getProperty("java.io.tmpdir") + "/" + invoiceNo + "_Annexture.xls";
+		String destination = System.getProperty("java.io.tmpdir") + "/" + userName +"/" + invoiceNo + "_Annexture.xls";
 
 		String docNameToDownload = boqDetailsDao.getLatestAssociatedBOQProject(projectId);
 
@@ -821,7 +809,10 @@ public class InventoryController {
 			excelByts = writer.writeExcel(boqlineData, size, quantity, supplyRate, erectionRate, supplyAmount,
 					erectionAmount, "", header, false, true);
 
-			FileOutputStream fOut = new FileOutputStream(new File(destination));
+			File fileToSave = new File(destination);
+			fileToSave.getParentFile().mkdirs();
+
+			FileOutputStream fOut = new FileOutputStream(fileToSave);
 
 			fOut.write(excelByts);
 

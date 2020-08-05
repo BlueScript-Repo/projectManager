@@ -34,6 +34,28 @@ public class ChallanDao {
 
 	return saved;
     }
+
+	@Transactional
+	public boolean deleteChallan(String projectId) {
+		boolean deleted = true;
+		try
+		{
+			Session session = sessionFactory.getCurrentSession();
+
+			String deleteSQL = "delete from ChallanDetails cd where cd.projectId='"+projectId+"'";
+
+			Query qry = session.createQuery(deleteSQL);
+
+			qry.executeUpdate();
+
+		} catch (Exception ex)
+		{
+			ex.printStackTrace();
+			deleted = false;
+		}
+
+		return deleted;
+	}
     
     @Transactional
     public List<String> getLrNo(String projectId) {

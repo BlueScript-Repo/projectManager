@@ -57,6 +57,25 @@ public class TaxInvoiceDetailsDao {
 		return taxInvoiceDetailsList;
 	}
 
+
+	@Transactional
+	public boolean deleteTaxIvoiceData(String projectId)
+	{
+		boolean deleted = true;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			String sql = "delete from TaxInvoiceDetails td where td.projectId='" + projectId + "'";
+
+			Query query = session.createQuery(sql);
+
+			query.executeUpdate();
+		} catch (Exception ex) {
+			deleted = false;
+			ex.printStackTrace();
+		}
+		return deleted;
+	}
+
 	@Transactional
 	public String getLastTaxIvoiceNo() {
 		String lastTaxInvoiceno = "";

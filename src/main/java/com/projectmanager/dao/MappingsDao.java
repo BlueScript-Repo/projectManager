@@ -116,8 +116,7 @@ public class MappingsDao {
 	public ArrayList<String> getAllInventory(){
 		Session session = sessionFactory.getCurrentSession();
 		String selectHql = "select distinct inventoryName from Mappings";
-	
-		
+
 		Query query = session.createQuery(selectHql);
 		
 		List inventoryList = query.getResultList();

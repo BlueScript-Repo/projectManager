@@ -2,9 +2,11 @@ package com.projectmanager.entity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.annotation.ManagedBean;
 
+import com.projectmanager.util.NotificationUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,22 +26,20 @@ public class TaxInvoiceGenerator {
 	@Autowired
 	EmailUtils emailUtils;
 
-	public void generateAndSendTaxInvoice(TaxInvoiceDetails taxInvoiceDetails, String sender) {
+	@Autowired
+	NotificationUtil notificationUtil;
 
-		invoiceGenerator.createInvoice(taxInvoiceDetails);
-		emailUtils.sendMessageWithAttachment(sender, taxInvoiceDetails.getEmailAddress(),
-				taxInvoiceDetails.getTaxInvoiceNo(), false, taxInvoiceDetails.getInvoiceNo());
+	public void generateAndSendTaxInvoice(TaxInvoiceDetails taxInvoiceDetails, String sender, String userName) {
 
+		invoiceGenerator.createInvoice(taxInvoiceDetails, userName);
+
+		//Instead of sending email directly, notification entry will be pushed in Notifications DB
+		/*emailUtils.sendMessageWithAttachment(sender, taxInvoiceDetails.getEmailAddress(),
+				taxInvoiceDetails.getTaxInvoiceNo(), false, taxInvoiceDetails.getInvoiceNo());*/
+
+		String fileToAttach = taxInvoiceDetails.getInvoiceNo();
+		notificationUtil.pushNotification(userName,taxInvoiceDetails.getEmailAddress(),"Tax Invoice : Hamdule Industries", "Please find attached the Tax Invoice.",fileToAttach.replace("/", "_") + ".pdf" +";"+fileToAttach.replace("/", "_") + "_Annexture.xls","INBOX", new Date());
 		taxInvoiceDetailsDao.saveTaxIvoice(taxInvoiceDetails);
-		try {
-			FileUtils.forceDelete(new File(System.getProperty("java.io.tmpdir") + "/"
-					+ taxInvoiceDetails.getInvoiceNo().replace("/", "_") + ".pdf"));
-			FileUtils.forceDelete(new File(System.getProperty("java.io.tmpdir") + "/"
-					+ taxInvoiceDetails.getInvoiceNo().replace("/", "_") + "_Annexture.xls"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	private final String TAX_INVOICE_ATTACHMENT_NAME = "TaxInvoice.pdf";

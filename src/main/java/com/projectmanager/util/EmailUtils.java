@@ -65,45 +65,35 @@ public class EmailUtils {
 		return mailSender;
 	}
 
-	@SuppressWarnings("deprecation")
-	public void sendMessageWithAttachment(String sender, String recipient, String taxInvoiceName, boolean reminder,
-			String fileToAttach) {
+	public void sendMessageWithAttachment(String sender, String recipient, String subject, String text,
+			String fileToAttach, String userName) {
 
-		String subject = "Tax Invoice : Hamdule Industries";
-		String text = "Please find attached the Tax Invoice.";
-		String from = "ProjectInvManager@gmail.com";
+		String[] attachments = fileToAttach.split(",");
 
-		if (reminder) {
-			subject = "Payment Reminder - " + subject;
-			text = "Gentel reminder for pending payment. Please see attached tax invoice for pending amount.";
+		String pathToInvoice = System.getProperty("java.io.tmpdir") + "/" + userName + "/" + attachments[0];
+
+
+
+		File[] file = {};
+
+		if(attachments.length>1 && !("".equals(attachments[1].trim())))
+		{
+			String pathToAnnextur = System.getProperty("java.io.tmpdir") + "/" + userName + "/" + attachments[1];
+			file = new File[]{new File(pathToInvoice.trim()), new File(pathToAnnextur.trim())};
+		}
+		else
+		{
+			file = new File[]{ new File(pathToInvoice.trim())};
 		}
 
-		String pathToInvoice = System.getProperty("java.io.tmpdir") + "/" + fileToAttach.replace("/", "_") + ".pdf";
-		String pathToAnnextur = System.getProperty("java.io.tmpdir") + "/" + fileToAttach.replace("/", "_")
-				+ "_Annexture.xls";
-
-		File[] file = { new File(pathToInvoice), new File(pathToAnnextur) };
 		sendEmail(subject, sender, recipient, text, file);
 
 	}
-	/*public void sendEmailCode(String sender, String recipient, String randomCode){
-		String subject = "Forget Password code";
-		String text = "Please copy following code.";
-		//String from = "ProjectInvManager@gmail.com";
-		
-		
-		File[] filesToattach = null;
-		
-		sendEmail(subject, sender, recipient, text, filesToattach);
-	}*/
 
-	public void sendInquiry(String sender, String recipient, byte[] fileBytes, String inquiryName) {
+	public void sendInquiry(String sender, String recipient, byte[] fileBytes, String inquiryName, File file) {
 		String subject = "Hamdule Projects : Inventory Inquiry";
 
 		String text = "Greeting of thr day from hamdule Industries. Please find attached the Inventory requirment. PLeaase update the same and respond.";
-
-		String pathToAttachment = System.getProperty("java.io.tmpdir") + "/" + inquiryName + ".xls";
-		File file = new File(pathToAttachment);
 
 		FileOutputStream fos;
 		try {

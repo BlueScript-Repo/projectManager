@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.projectmanager.util.HTMLElements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,8 @@ import com.projectmanager.entity.LoginInfo;
 import com.projectmanager.entity.Project;
 import com.projectmanager.entity.SessionEntry;
 import com.projectmanager.entity.UserDetails;
+
+import java.util.ArrayList;
 
 @Controller
 @EnableWebMvc
@@ -82,21 +85,29 @@ public class LoginControlle {
 		ModelAndView modelAndView = new ModelAndView(view);
 
 		if (validaLogin) {
-			String projectIdVal = "";
+			ArrayList<String> projectIdVal = new ArrayList<>();
 
 			projectIdVal = boqDetailsDao.getRecentProject();
 
-			Project project = projectDao.getProject(Integer.parseInt(projectIdVal));
+			int sizeToIterate = projectIdVal.size()>5?5:projectIdVal.size();
 
-			if (!(projectIdVal.equals("") || projectIdVal.equals("0"))) {
-				modelAndView.addObject("projectDesc", project.getProjectDesc());
-				modelAndView.addObject("projectIdVal", projectIdVal);
-				modelAndView.addObject("projectNameVal", project.getProjectName());
-			} else {
-				modelAndView.addObject("projectDesc", "No Recent Project");
-				modelAndView.addObject("projectIdVal", "No Recent Project");
-				modelAndView.addObject("projectNameVal", "No Recent Project");
+			StringBuilder StringToSend = new StringBuilder();
+
+			for(int k=0; k<sizeToIterate; k++)
+			{
+				String template = HTMLElements.CURRENT_PROJECTS;
+
+				Project project = projectDao.getProject(Integer.parseInt(projectIdVal.get(k)));
+
+				template = template.replaceAll("projectNameVal",project.getProjectName());
+				template = template.replaceAll("projectIdVal", String.valueOf(project.getProjectId()));
+				template = template.replaceAll("projectDescVal",project.getProjectDesc());
+
+				StringToSend.append(template);
 			}
+
+
+			modelAndView.addObject("projectList", StringToSend.toString());
 		}
 
 		return modelAndView;
@@ -113,10 +124,8 @@ public class LoginControlle {
 		return validLogin;
 	}
 
-	@RequestMapping(value = "/logout", method = RequestMethod.POST)
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	protected ModelAndView logout(HttpSession session) {
-
-
 		String sessionId = String.valueOf(session.getAttribute("sessionId"));
 		boolean sessionDelete = true;
 		String userName = (String) session.getAttribute("userName");
@@ -125,13 +134,13 @@ public class LoginControlle {
 	}
 
 	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-	protected @ResponseBody String registerUser(UserDetails userDetails) {
+	protected @ResponseBody String registerUser(UserDetails userDetails, String userRole) {
 		String result = "SUCCESS";
 		boolean loginInfoAdded = false;
 		boolean userRegistered = userDetailsDao.saveUser(userDetails);
 		if (userRegistered) {
 			loginInfoAdded = loginInfoDao
-					.addLoginInfo(new LoginInfo(userDetails.getUserName(), userDetails.getUserPassword(), ""));
+					.addLoginInfo(new LoginInfo(userDetails.getUserName(), userDetails.getUserPassword(), userRole));
 		}
 
 		if (!userRegistered || !loginInfoAdded) {

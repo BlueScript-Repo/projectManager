@@ -57,6 +57,28 @@ public class PODetailsDao {
 	return boqDetailsNameList;
     }
 
+	@Transactional
+	public boolean deletePO(String projectId) {
+		boolean deleted = true;
+		try
+		{
+			Session session = sessionFactory.getCurrentSession();
+
+			String lrNoSQL = "delete from PODetails poD where poD.projectId='" + projectId + "'";
+
+			Query qry = session.createQuery(lrNoSQL);
+
+			qry.executeUpdate();
+
+		} catch (Exception ex) {
+			deleted = false;
+
+			ex.printStackTrace();
+		}
+
+		return deleted;
+	}
+
     @Transactional
     public List<String> getPoNumber(String projectId) {
 	List<String> lrList = new ArrayList<String>();

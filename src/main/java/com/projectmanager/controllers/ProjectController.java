@@ -46,6 +46,9 @@ public class ProjectController {
 	private BOQDetailsDao boqDao;
 
 	@Autowired
+	private BOQHeaderDao boqHeaderDao;
+
+	@Autowired
 	private TaxInvoiceDetailsDao taxInvoiceDao;
 
 	@Autowired
@@ -71,6 +74,10 @@ public class ProjectController {
 
 	@Autowired
 	MappingsDao mappingsDao;
+
+	@Autowired
+	ChallanDao challanDao;
+
 	@Autowired
 	ExcelReader reader;
 
@@ -112,8 +119,23 @@ public class ProjectController {
 
 	}
 
+	@RequestMapping(value = "/deleteProject", method = RequestMethod.POST)
+	protected ModelAndView deleteProject(String projectId)
+	{
+		projectDao.deleteProject(projectId);
+		boqHeaderDao.deleteHeaderData(projectId);
+		challanDao.deleteChallan(projectId);
+		paymentDetailsDao.deletePaymentDetails(projectId);
+		poDetailsDao.deletePO(projectId);
+		projectDetailsDao.deleteProjectDetails(projectId);
+		taxInvoiceDao.deleteTaxIvoiceData(projectId);
+
+		return new ModelAndView("redirect:/home");
+	}
+
 	@RequestMapping(value = "/updateProject", method = RequestMethod.POST)
-	protected ModelAndView updateProject(ProjectDetails projectDetails) throws Exception {
+	protected ModelAndView updateProject(ProjectDetails projectDetails) throws Exception
+	{
 		projectDetailsDao.updateProjet(projectDetails);
 
 		projectDetails = projectDetailsDao.getProjectDetails(projectDetails.getProjectId());
@@ -183,7 +205,7 @@ public class ProjectController {
 
 		ArrayList<PaymentDetails> payDetails = paymentDetailsDao.getPayentDetails(projectId);
 
-		String payDetailsString = getPayDetailsString(payDetails);
+		String payDetailsString = getPayDetailsString(payDetails, taxInvoiceNames);
 
 		ArrayList<String> boqNames = boqDao.getAssociatedBOQNames(String.valueOf(project.getProjectId()));
 		ArrayList<String> quotationNames = new ArrayList<String>();
@@ -301,11 +323,21 @@ public class ProjectController {
 
 		mav.addObject("venderList", vendorsList);
 
-		mav.addObject("taxInvoiceNamesList", taxInvoiceNames != null ? taxInvoiceNames : " ");
+		String invoiceList = taxInvoiceNames != null ? taxInvoiceNames : " ";
+		mav.addObject("taxInvoiceNamesList", invoiceList);
+		mav.addObject("invoiceList", invoiceList);
 		mav.addObject("projectId", project.getProjectId());
 		mav.addObject("projectName", project.getProjectName());
 		mav.addObject("projectDesc", project.getProjectDesc());
 		mav.addObject("paymentDetails", payDetailsString);
+
+		int size = payDetails.size();
+		String pendingAmount = size>0?payDetails.get(size-1).getPendingAmount():"0.0";
+		String totalAmount = size>0?payDetails.get(size-1).getTotalAmount():"";
+
+		mav.addObject("pendingAmount", pendingAmount);
+		mav.addObject("totalAmount", totalAmount);
+
 		mav.addObject("poNamesList", poNames != null ? poNames : " ");
 
 		project = projectDao.getProject(Integer.parseInt(projectId));
@@ -443,23 +475,24 @@ public class ProjectController {
 	}
 
 	@RequestMapping(value = "/updatePaymentDetails", method = { RequestMethod.POST, RequestMethod.POST })
-	protected @ResponseBody String updatePaymentDetails(String taxInvoiceNumber, String receivedAmount,
+	protected @ResponseBody String updatePaymentDetails(String receivedAmount,
 			String paymentMode, String projectId) {
 		double totalAmount = 0.0;
 		try {
-			List<PaymentDetails> paymentDetailsList = paymentDetailsDao.getPayentDetails(taxInvoiceNumber, projectId);
+			List<PaymentDetails> paymentDetailsList = paymentDetailsDao.getPayentDetails(projectId);
 			PaymentDetails payDetails = null;
 
-			// Get total Amount for the invoice
-			ArrayList<TaxInvoiceDetails> taxinvoiceDetailsList = taxInvoiceDao.getTaxIvoiceData("taxInvoiceNo",
-					taxInvoiceNumber);
+			// Get total Amount for the project (Include all Invoices)
+			ArrayList<TaxInvoiceDetails> taxinvoiceDetailsList = taxInvoiceDao.getTaxIvoiceData("projectId", projectId);
 
-			totalAmount = Double.parseDouble(taxinvoiceDetailsList.get(0).getTotal());
-			totalAmount = totalAmount + Double.parseDouble(taxinvoiceDetailsList.get(0).getcGst()) * 2;
-
-			if (taxinvoiceDetailsList.get(0).getMiscCharges() != null) {
-				totalAmount = totalAmount + Double.parseDouble(taxinvoiceDetailsList.get(0).getMiscCharges());
+			for(TaxInvoiceDetails taxInvoiceDetails : taxinvoiceDetailsList)
+			{
+				System.out.println("taxInvoiceDetails.getTotal() : "+taxInvoiceDetails.getTotal());
+				totalAmount = totalAmount + Double.parseDouble(taxInvoiceDetails.getTotal());
+				totalAmount = totalAmount + Double.parseDouble(taxInvoiceDetails.getcGst()) * 2;
 			}
+
+			totalAmount = Math.ceil(totalAmount);
 
 			String dateReceived = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss aa").format(new Date());
 
@@ -472,11 +505,15 @@ public class ProjectController {
 
 			} else {
 				pendingAmount = String.valueOf(totalAmount - Double.parseDouble(receivedAmount));
-				payDetails = new PaymentDetails(taxInvoiceNumber, String.valueOf(totalAmount), receivedAmount,
-						pendingAmount, paymentMode, dateReceived, projectId);
+				payDetails = new PaymentDetails(String.valueOf(totalAmount),
+						receivedAmount,
+						pendingAmount,
+						paymentMode,
+						dateReceived,
+						projectId);
 			}
 
-			paymentDetailsDao.savePaymentDetails(new PaymentDetails(taxInvoiceNumber, payDetails.getTotalAmount(),
+			paymentDetailsDao.savePaymentDetails(new PaymentDetails(payDetails.getTotalAmount(),
 					receivedAmount, pendingAmount, paymentMode, dateReceived, projectId));
 
 		} catch (Exception ex) {
@@ -501,14 +538,16 @@ public class ProjectController {
 		return invoiceNamesString.toString();
 	}
 
-	private String getPayDetailsString(ArrayList<PaymentDetails> payDetailsList) {
+	private String getPayDetailsString(ArrayList<PaymentDetails> payDetailsList, String taxInvoiceNamelist) {
 		String payDetailsString = "";
 
+
+		int index = 1;
 		for (PaymentDetails paymentDetail : payDetailsList) {
 			String tempRow = paymentRow;
 
-			tempRow = tempRow.replace("paymentID", String.valueOf(paymentDetail.getPaymentId()));
-			tempRow = tempRow.replace("taxInvoiceNumber", paymentDetail.getTaxInvoiceNumber());
+			tempRow = tempRow.replace("paymentID", String.valueOf(index));
+			tempRow = tempRow.replace("taxInvoiceNumber", taxInvoiceNamelist);
 			tempRow = tempRow.replace("totalAmount", paymentDetail.getTotalAmount());
 			tempRow = tempRow.replace("amountReceived", paymentDetail.getReceivedAmount());
 			tempRow = tempRow.replace("amountPrnding", paymentDetail.getPendingAmount());
@@ -517,6 +556,8 @@ public class ProjectController {
 
 			System.out.println("tempRow is : " + tempRow);
 			payDetailsString = payDetailsString + tempRow;
+
+			index++;
 		}
 
 		return payDetailsString;
@@ -544,8 +585,7 @@ public class ProjectController {
 		return paymentDetails;
 	}
 
-	private static final String paymentRow = "<tr><th>paymentID</th>" + "<th>taxInvoiceNumber</th>"
-			+ "<th>totalAmount</th>" + "<th>amountReceived</th>" + "<th>amountPrnding</th>" + "<th>paymentMethod</th>"
+	private static final String paymentRow = "<tr><th>paymentID</th>"  + "<th>amountReceived</th>" + "<th>paymentMethod</th>"
 			+ "<th>dateReceived</th>" + "</tr>";
 
 	private static final String projectRow = "<form action=\"projectDetails\" onClick=\"this.submit();\" method=\"POST\"> <div class=\"row\">"

@@ -14,7 +14,7 @@ public class PaymentDetails {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int paymentId;
     
-    private String taxInvoiceNumber;
+    /*private String taxInvoiceNumber;*/
     private String totalAmount;
     private String receivedAmount;
     private String pendingAmount;
@@ -26,10 +26,10 @@ public class PaymentDetails {
 
     }
  
-	public PaymentDetails(String taxInvoiceNumber, String totalAmount, String receivedAmount, String pendingAmount,
+	public PaymentDetails(String totalAmount, String receivedAmount, String pendingAmount,
 			String paymentMode, String dateReceived, String projectId) {
 		super();
-		this.taxInvoiceNumber = taxInvoiceNumber;
+		//this.taxInvoiceNumber = taxInvoiceNumber;
 		this.totalAmount = totalAmount;
 		this.receivedAmount = receivedAmount;
 		this.pendingAmount = pendingAmount;
@@ -47,13 +47,13 @@ public class PaymentDetails {
 		this.paymentId = paymentId;
 	}
 
-	public String getTaxInvoiceNumber() {
+	/*public String getTaxInvoiceNumber() {
 		return taxInvoiceNumber;
 	}
 
 	public void setTaxInvoiceNumber(String taxInvoiceNumber) {
 		this.taxInvoiceNumber = taxInvoiceNumber;
-	}
+	}*/
 
 	public String getTotalAmount() {
 		return totalAmount;

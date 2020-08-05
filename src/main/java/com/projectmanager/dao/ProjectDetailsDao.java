@@ -87,4 +87,24 @@ public class ProjectDetailsDao {
 
 		return progDetails;
 	}
+
+	@Transactional
+	public boolean deleteProjectDetails(String projectId) {
+
+		boolean deleted = true;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+
+			String hql = "delete FROM ProjectDetails P WHERE P.projectId = ";
+
+			Query query = session.createQuery(hql + projectId);
+			query.executeUpdate();
+		}
+		catch(Exception ex)
+		{
+			deleted = false;
+			ex.printStackTrace();
+		}
+		return deleted;
+	}
 }

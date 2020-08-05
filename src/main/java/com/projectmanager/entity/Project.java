@@ -31,7 +31,14 @@ public class Project implements Serializable{
 	{
 		
 	}
-	
+
+	public Project(int projectId, String projectName, String projectDesc, String companyName) {
+		this.projectId = projectId;
+		this.projectName = projectName;
+		this.projectDesc = projectDesc;
+		this.companyName = companyName;
+	}
+
 	public int getProjectId() {
 		return projectId;
 	}

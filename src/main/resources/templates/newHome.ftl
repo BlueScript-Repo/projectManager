@@ -27,40 +27,7 @@
 </head>
 <body class="front-page transparent-header">
   <div class="page-wrapper">
-    <div class="header-container">
-      <div class="header-top dark">
-        <div class="container">
-          <div class="row">
-            <div class="col-3 col-sm-6 col-lg-9">
-            </div>
-            <div class="col-9 col-sm-6 col-lg-3">
-              <div id="header-top-second"  class="clearfix">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <header class="head-section">
-       <div class="row warning-bg">
-         
-         <div class="col-md-4">
-          <div class="navbar navbar-default navbar-static-top container">
-            <div class="navbar-header" style="width: 200px;">
-              <img src="./images/img/Hamdule-Logo1.png" alt="" style="width: 200px;height: 55px;margin-top: 20px;">
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-         </div>
-        <div class="col-md-2">
-        </div>
-        <div class="col-md-2"> 
-          <form class="form-horizontal" action="logout" method="POST" style="margin-left: 30px;margin-top: 30px;">
-            <button type="submit" class="btn btn-primary btn-animated">Log Out <i class="fa fa-user"></i></button>
-          </form>
-        </div>
-      </header>
-    </div>
+    <#include "./header.ftl">
     <div class="banner clearfix">
       <div class="slideshow">
       </div>
@@ -96,24 +63,23 @@
           <div class="col-lg-3">
             <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible" data-animation-effect="fadeInDownSmall" data-effect-delay="200" onclick="$('#updateInv').submit();">
               <span class="icon default-bg circle"><i class="fa fa fa-snowflake-o"></i></span>
-              <form id="updateInv" action="updateInvPO" method="GET">                
-                <h3>Manage Inventory</h3>
-              </form>
+              <h3>Manage Inventory</h3>              
+              <form id="updateInv" action="updateInvPO" method="GET"></form>              
               <div class="separator clearfix"></div>
-              <p>Use this link to access Inventory page to update system when Invemtory is received,</p>
+              <p>Use this link to access Inventory page to update system when Invemtory is received.</p>
+              <br>
             </div>
           </div>
-           <div class="col-lg-3">
+          <div class="col-lg-3">
             <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible" data-animation-effect="fadeInDownSmall" data-effect-delay="200" onclick="$('#inventoryDet').submit();">
               <span class="icon default-bg circle"><i class="fa fa fa-snowflake-o"></i></span>
-              <form id="inventoryDet" action="inventoryDetails" method="GET">                
-                <h3>Inventory Details</h3>
-              </form>
+              <h3>Admin Section</h3>
+              <form id="inventoryDet" action="inventoryDetails" method="GET"></form>              
               <div class="separator clearfix"></div>
-              <p>Use this for update Inventory details.</p>
+              <p>Use this section to update the configuration and taxes applied.</p>
+              <br>
             </div>
-          </div>
-          
+          </div>          
         </div>
       </div>
     </section>
@@ -243,6 +209,12 @@
         <input type="text" class="form-control" name="emailAddress" required>
       </div>
       <div class="form-group col-md-3">
+        <label >User Email</label>
+        <select class="form-control" name="userRole">
+          <option value="Admin">Admin</option>
+          <option value="Accounts">Accounts</option>
+          <option value="Engineer">Engineer</option>
+        </select>        
       </div>
       <div class="form-group col-md-3">
         <br>
@@ -269,26 +241,36 @@
         </div>
       </dir>
       <dir class="col-md-4">
-        <div class="white-bg shadow p-20 text-center object-non-visible animated object-visible fadeInUpSmall" data-animation-effect="fadeInUpSmall" data-effect-delay="100" onclick="$('#projectDetails').submit();">
-          <form id="projectDetails" action="projectDetails" method="POST" style="margin-top: 10px;">                
-            <h3 class="mt-4" >${projectNameVal}</h3>
-            <div class="separator clearfix"></div>
-            <input type='hidden' name='projectId' value='${projectIdVal}'/>
-            <input type='hidden' name='projectName' value='${projectNameVal}'/>
-            <input type='hidden' name='projectDesc' value='${projectDesc}'/>
-          </form> 
+        <div class="white-bg shadow p-20 text-center object-non-visible animated object-visible fadeInUpSmall" data-animation-effect="fadeInUpSmall" data-effect-delay="100"  data-toggle="modal" data-target="#currentProjectModal">
+          <h3 class="mt-4" >Current Projects</h3>
+          <div class="separator"></div>
         </div>
       </dir>
     </div>
   </div>
 </section>
+<div class="modal fade" id="currentProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Current Projects</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>      
+        <div class="modal-body">
+          ${projectList}
+          <br/>
+        </div>      
+    </div>
+  </div>
+</div>
+
 <footer id="footer" class="clearfix ">
   <div class="subfooter">
     <div class="container">
       <div class="subfooter-inner">
         <div class="row">
           <div class="col-md-12">
-            <p class="text-center">Copyright © 2018 The Project. All rights reserved.</p>
+            <p class="text-center">Powered By Social Angels Digital Solution Pvt Ltd.</p>
           </div>
         </div>
       </div>
@@ -375,7 +357,8 @@
       || $('[name="firstName"]').val()===''
       || $('[name="lastName"]').val()===''
       || $('[name="contactNumber"]').val()===''
-      || $('[name="emailAddress"]').val()==='')
+      || $('[name="emailAddress"]').val()===''
+      || $('[name="userRole"]').val()==='')
     {
       alert('Please fill out all the fields and try again..!!');
       return;
@@ -384,7 +367,7 @@
     showLoading();
     $.ajax({
      type : 'POST',
-     data :  {'userPassword' : $('[name="userPassword"]').val(), 'userName' : $('[name="userName"]').val(), 'firstName': $('[name="firstName"]').val(), 'lastName': $('[name="lastName"]').val(), 'contactNumber': $('[name="contactNumber"]').val(), 'emailAddress': $('[name="emailAddress"]').val()},
+     data :  {'userPassword' : $('[name="userPassword"]').val(), 'userName' : $('[name="userName"]').val(), 'firstName': $('[name="firstName"]').val(), 'lastName': $('[name="lastName"]').val(), 'contactNumber': $('[name="contactNumber"]').val(), 'emailAddress': $('[name="emailAddress"]').val(), 'userRole' : $('[name="userRole"]').val()},
      url : 'registerUser',
      success : function(data) 
      {

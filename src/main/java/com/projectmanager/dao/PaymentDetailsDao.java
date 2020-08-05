@@ -34,6 +34,26 @@ public class PaymentDetailsDao {
 	}
 
 	@Transactional
+	public boolean deletePaymentDetails(String projectId) {
+
+		boolean deleted = true;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			String deleteHql = "delete FROM PaymentDetails payD where payD.projectId=:projectId";
+
+			Query deleteQuery = session.createQuery(deleteHql);
+
+			deleteQuery.executeUpdate();
+		}
+		catch(Exception ex)
+		{
+			deleted = false;
+			ex.printStackTrace();
+		}
+		return deleted;
+	}
+
+	@Transactional
 	public ArrayList<PaymentDetails> getPayentDetails(String taxInvoiceNumber, String projectId) {
 
 		ArrayList<PaymentDetails> paymentDetailsList = new ArrayList<PaymentDetails>();

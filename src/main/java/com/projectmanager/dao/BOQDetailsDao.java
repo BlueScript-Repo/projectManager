@@ -105,16 +105,16 @@ public class BOQDetailsDao {
 	}
 
 	@Transactional
-	public String getRecentProject() {
-		String projectId = "0";
+	public ArrayList<String> getRecentProject() {
+		ArrayList<String> projectId = new ArrayList<>();
 		Session session = sessionFactory.getCurrentSession();
-		String queryString = "SELECT projectId FROM BOQDetails WHERE id IN (SELECT MAX(id) FROM BOQDetails)";
+		String queryString = "SELECT distinct(projectId) FROM BOQDetails";
 		Query query = session.createQuery(queryString);
 
 		try {
-			projectId = (String) query.getSingleResult();
+			projectId = (ArrayList<String>) query.getResultList();
 		} catch (Exception ex) {
-			projectId = "0";
+			ex.printStackTrace();
 		}
 		return projectId;
 	}

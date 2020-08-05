@@ -33,6 +33,23 @@ public class ProjectDao {
 	}
 
 	@Transactional
+	public boolean deleteProject(String projectId) {
+
+		boolean projectDeleted = true;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+
+			session.delete(new Project(Integer.parseInt(projectId), "", "", ""));
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			projectDeleted = false;
+		}
+		return projectDeleted;
+	}
+
+	@Transactional
 	public Project getProject(int projectId) {
 		Project project = new Project();
 		

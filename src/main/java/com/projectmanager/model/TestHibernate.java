@@ -1,22 +1,39 @@
 package com.projectmanager.model;
 
-import com.itextpdf.text.FontFactory;
-import com.projectmanager.util.InventoryUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 import com.projectmanager.entity.Project;
-import org.springframework.util.ResourceUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 
 public class TestHibernate {
 
 	private static SessionFactory sessionFactory;
 
 	public static void main(String[] args) {
+
 		try {
-/*			Configuration configuration = new Configuration();
+			String dateStr = "2020";
+
+			ArrayList<String> stringList = new ArrayList<>();
+
+			stringList.add(dateStr);
+
+			System.out.println(stringList.contains("2020"));
+
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+/*		try {
+			Configuration configuration = new Configuration();
 			configuration.addAnnotatedClass(com.projectmanager.entity.Project.class);
 			
 			sessionFactory = configuration.configure().buildSessionFactory();
@@ -28,11 +45,45 @@ public class TestHibernate {
 			
 			System.out.println("Added a projet with Id : "+projId);*/
 
-			FontFactory.register(ResourceUtils.getFile("classpath:static/fonts/bank_gothic_light_bt.ttf").getAbsolutePath(),"Bank_Gothic");
+			/*String[] description = {"1","2","3","4","5","6","7","8","9","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27"};
+			ArrayList<String[]> descriptionList = new ArrayList<>();
+
+			int pages = Math.round(description.length/10)+1;
+
+			try {
+				for (int i = 0; i < pages; i++) {
+
+					int end = 10 * i + 9;
+					if (description.length < 10 * i + 10) {
+						end = description.length - 1;
+					}
+
+					//System.arraycopy(description, 10 * i, newArray, 10 * i, newArray.length);
+
+					String[] newArray = Arrays.copyOfRange(description,10 * i, end);
+
+					descriptionList.add(newArray);
+				}
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Done");
+			}
+
+			System.out.println(" descriptionList size is : "+descriptionList.size());
+			int index=0;
+			for(String[] oldArray : descriptionList)
+			{
+				System.out.println("Index is : "+index);
+				for(int j=0;j<oldArray.length;j++)
+				{
+					System.out.print(oldArray[j]+"-");
+				}
+			}
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
+		}*/
 	}
 
 	public int addProject(Project proj) {

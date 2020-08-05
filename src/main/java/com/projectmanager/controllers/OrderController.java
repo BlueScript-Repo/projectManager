@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
+import com.projectmanager.dao.*;
+import com.projectmanager.util.NotificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,11 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.amazonaws.util.StringUtils;
-import com.projectmanager.dao.InventoryDao;
-import com.projectmanager.dao.PODetailsDao;
-import com.projectmanager.dao.ProjectDao;
-import com.projectmanager.dao.ProjectDetailsDao;
-import com.projectmanager.dao.TaxInvoiceDetailsDao;
 import com.projectmanager.entity.Inventory;
 import com.projectmanager.entity.InventorySpec;
 import com.projectmanager.entity.PODetails;
@@ -27,6 +25,8 @@ import com.projectmanager.entity.Project;
 import com.projectmanager.entity.ProjectDetails;
 import com.projectmanager.entity.TaxInvoiceDetails;
 import com.projectmanager.util.InventoryUtils;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @EnableWebMvc
@@ -49,6 +49,9 @@ public class OrderController {
 
 	@Autowired
 	InventoryDao inventoryDao;
+
+	@Autowired
+	NotificationUtil notificationUtil;
 
 	@RequestMapping(value = "/generateOrderForm", method = RequestMethod.POST)
 	public ModelAndView generateOfferFrom(String[] inventoryName, String[] material, String[] type, String[] manifMetod,
@@ -84,7 +87,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/generateOrder", method = RequestMethod.POST)
-	public String generateOffer(PODetails poDetails, String lineItemSimple, Model model) {
+	public String generateOffer(PODetails poDetails, String lineItemSimple, Model model, HttpSession session) {
 
 		ModelAndView mav = new ModelAndView("purchaseOrder");
 
@@ -165,6 +168,15 @@ public class OrderController {
 
 		model.addAttribute("poLineDetails", lineItemSimpleStr);
 
+
+		String userName = (String)session.getAttribute("userName");
+
+		model.addAttribute("userName", userName);
+
+		//save entry to notification table
+
+		notificationUtil.pushNotification(userName,poDetails.getContactEmail(),"Purchase Order :" + poDetails.getVendorName(),"Enter body Text here",poNumber+"pdf","INBOX",new Date());
+
 		return "purchaseOrderView";
 
 	}
@@ -179,7 +191,8 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/showPO", method = { RequestMethod.POST, RequestMethod.GET })
-	private String showPO(Model model, String poName) {
+	private String showPO(Model model, String poName)
+	{
 		ArrayList<PODetails> invoiceDetails = poDetailsDao.getPOData("poNumber", poName);
 
 		System.out.println("showPO : " + poName);
@@ -312,6 +325,9 @@ public class OrderController {
 				+ "</TR>                                                                       ";
 
 		float amount = Float.parseFloat(quantity) * Float.parseFloat(supplyRate);
+
+		//Updated below code to use TAX values from DB
+
 		float sgst = amount * 9 / 100;
 		float cgst = amount * 9 / 100;
 

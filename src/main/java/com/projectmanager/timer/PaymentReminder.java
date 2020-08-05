@@ -28,22 +28,22 @@ public class PaymentReminder {
 	@Autowired
 	EmailUtils emailUtils;
 
-	@Scheduled(cron = "* * 9 * * ?")
+	/*@Scheduled(cron = "* * 9 * * ?")*/
 	public void sendReminder() {
 		ArrayList<PaymentDetails> pendingpaymentDetailsList = paymentDetailsDao.getPendingPayentDetails();
 
 		for (PaymentDetails pendingPaymentDetails : pendingpaymentDetailsList) {
 			TaxInvoiceDetails taxInvoiceDetails = taxInvoiceDetailsDao
-					.getTaxIvoiceData("taxInvoiceNo", pendingPaymentDetails.getTaxInvoiceNumber()).get(0);
+					.getTaxIvoiceData("taxInvoiceNo", "").get(0);
 
 			taxInvoiceDetails.setRate(pendingPaymentDetails.getPendingAmount());
-			invoiceGenerator.createInvoice(taxInvoiceDetails);
+			/*invoiceGenerator.createInvoice(taxInvoiceDetails);*/
 
-			emailUtils.sendMessageWithAttachment("",taxInvoiceDetails.getEmailAddress(),
-					taxInvoiceDetails.getTaxInvoiceNo(), true, taxInvoiceDetails.getInvoiceNo());
+/*			emailUtils.sendMessageWithAttachment("",taxInvoiceDetails.getEmailAddress(),
+					taxInvoiceDetails.getTaxInvoiceNo(), true, taxInvoiceDetails.getInvoiceNo());*/
 
 			try {
-				FileUtils.forceDelete(new File(System.getProperty("java.io.tmpdir") + "/TaxInvoice.pdf"));
+				FileUtils.forceDelete(new File("/TaxInvoice.pdf"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

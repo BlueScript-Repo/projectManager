@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.itextpdf.text.*;
+import com.projectmanager.dao.TaxesDao;
+import com.projectmanager.entity.TaxesEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.view.AbstractView;
@@ -20,6 +23,9 @@ import com.itextpdf.text.FontFactory;
 
 @Component("taxInvoiceView")
 public class TaxInvoicePDFView extends AbstractView {
+
+	@Autowired
+	TaxesDao taxesDao;
 
 	@Override
 	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
@@ -143,21 +149,48 @@ public class TaxInvoicePDFView extends AbstractView {
 
 			table4.addCell(amtInWordsValCell);
 
+			TaxesEntity taxes = taxesDao.getTaxesDetails().get(0);
+
 			table4.addCell(createNewCell(new Paragraph("sub total:", boldBlackBGLB11)));
 			table4.addCell(createNewCell(new Paragraph(taxInvoiceDetails.getRate(), blackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("cgst 9%	 ", boldBlackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph(
-					String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100), blackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("SGST 9%	 ", boldBlackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph(
-					String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100), blackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("IGST 18%	 ", boldBlackBGLB11)));
-			table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+
+			if(taxInvoiceDetails.getGstNo().startsWith("27")) {
+				table4.addCell(createNewCell(new Paragraph("cgst 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph(
+						String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * taxes.getcGst() / 100), blackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("SGST 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph(
+						String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * taxes.getsGst() / 100), blackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("IGST 18%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+			}
+			else
+			{
+				table4.addCell(createNewCell(new Paragraph("cgst 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("-", blackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("SGST 9%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("_", blackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph("IGST 18%	 ", boldBlackBGLB11)));
+				table4.addCell(createNewCell(new Paragraph(String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate()) * taxes.getiGst() / 100), blackBGLB11)));
+			}
+
 			table4.addCell(createNewCell(new Paragraph("total	 ", boldBlackBGLB11)));
+
+			int taxValue = 0;
+			if(taxInvoiceDetails.getGstNo().startsWith("27"))
+			{
+				taxValue = taxes.getiGst();
+			}
+			else
+			{
+				taxValue = taxes.getcGst() + taxes.getsGst();
+			}
+
+
 			table4.addCell(
 					createNewCell(new Paragraph(
 							String.valueOf(Double.parseDouble(taxInvoiceDetails.getRate())
-									+ 2 * (Double.parseDouble(taxInvoiceDetails.getRate()) * 9 / 100)),
+									+ 2 * (Double.parseDouble(taxInvoiceDetails.getRate()) * taxValue / 100)),
 							blackBGLB11)));
 
 			document.add(table4);

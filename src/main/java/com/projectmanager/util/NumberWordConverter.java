@@ -51,4 +51,7 @@ public class NumberWordConverter {
         return convert(n / 1000000000) + " billion"  + ((n % 1000000000 != 0) ? " " : "") + convert(n % 1000000000);
     }
 
+    public static void main(String[] args) {
+        System.out.println( new NumberWordConverter().convert((int) Math.round(613.6)));
+    }
  }

@@ -44,50 +44,78 @@ public class AddInventoryController {
 	@RequestMapping(value = "/inventoryDetails", method = RequestMethod.GET)
 	private ModelAndView inventoryDetails(){
 		ModelAndView modelAndView = new ModelAndView();
-		
-		
-		//take mapping details  from db for loop 
-		ArrayList<String> inventoryList = mappingsDao.getAllInventory();
-		System.out.println(inventoryList);
+
+
 		StringBuffer mappingDetails = new StringBuffer();
-		int index = 1;
-		for(String inventory1 : inventoryList){
-			String inventory = inventory1;
-			System.out.println(inventory);
-			
-			ArrayList<String> materialList = mappingsDao.getMaterial(inventory1);
-			System.out.println(materialList);
-			
-			for(String material : materialList){
-					System.out.println(material);
-					
-					ArrayList<String> typeList = mappingsDao.getType(inventory,material);
-					String type = typeList.toString().replace("[","").replace("]", "");
-					System.out.println(type);
-					
-					ArrayList<String> classOrGradeList = mappingsDao.getClassOrGrade(inventory,material);
-					String classOrGrade = classOrGradeList.toString().replace("[","").replace("]", "");
-					System.out.println(classOrGrade);
-					
-					ArrayList<String> categoryList = mappingsDao.getCategory(inventory,material);
-					String category = categoryList.toString().replace("[","").replace("]", "");
-					System.out.println(category);
-					
-					
-					//int index = 1;
-				
-						mappingDetails.append("<tr>");
-						mappingDetails.append("<td><input type='text' style='width:50px' class='form-control' value='" + index + "' name='ItemId'  ></td>");
-						mappingDetails.append("<td><input type='checkbox' class='chkView' ></td>");
-						mappingDetails.append("<td><input type='text'  class='form-control' value='" + inventory + "' name='inventoryName'  ></td>");
-						mappingDetails.append("<td><input type='text'  class='form-control' value='" + material + "' name='material' ></td>");
-						mappingDetails.append("<td><input type='text'  class='form-control' value='" + type + "' name='type' disabled ></td>");
-						mappingDetails.append("<td><input type='text'  class='form-control' value='" + classOrGrade + "' name='classOrGrade' disabled ></td>");
-						mappingDetails.append("<td><input type='text'  class='form-control' value='" + category + "' name='catogory' disabled ></td>");
-						mappingDetails.append("</tr>");
-						index++;
+
+
+		ArrayList<Mappings> mappingsList = mappingsDao.getAllMappinsData();
+
+		ArrayList<ArrayList<String>> inventoryMaterial = new ArrayList<ArrayList<String>>();
+
+		ArrayList<String> doneInventory = new ArrayList<String>();
+
+		//Populate inventoryMaterial
+		for(Mappings mapping : mappingsList)
+		{
+			ArrayList<String> tempList = new ArrayList<String>();
+			tempList.add(mapping.getInventoryName());
+			tempList.add(mapping.getMaterial());
+
+			inventoryMaterial.add(tempList);
+		}
+
+		ArrayList<String> type = new ArrayList<>();
+		ArrayList<String> classOrGrade = new ArrayList<>();
+		ArrayList<String> category = new ArrayList<>();
+
+		for(ArrayList<String> invMet : inventoryMaterial)
+		{
+			String inventory = invMet.get(0);
+			String material = invMet.get(1);
+
+			String typeStr = "";
+			String classOrGradeStr = "";
+			String categoryStr = "";
+
+			for(Mappings mapping : mappingsList)
+			{
+				if(inventory.equals(mapping.getInventoryName()) && material.equals(mapping.getMaterial()))
+				{
+					typeStr = typeStr  + mapping.getType() + ",";
+					classOrGradeStr = classOrGradeStr  + mapping.getClassOrGrade() + ",";
+					categoryStr = categoryStr  + mapping.getCatogory()+ ",";
 				}
-					
+
+			}
+
+			type.add(typeStr);
+			classOrGrade.add(classOrGradeStr);
+			category.add(categoryStr);
+		}
+
+		int index = 0;
+		int indexToDisplay = 0;
+		ArrayList<String> done = new ArrayList<>();
+
+		for(ArrayList<String> invMet : inventoryMaterial)
+		{
+			if(!(done.contains(invMet.get(0)+invMet.get(1))))
+			{
+				done.add(invMet.get(0)+invMet.get(1));
+				mappingDetails.append("<tr class='lazy' >");
+				mappingDetails.append("<td><input type='hidden' class='form-control' value='" + indexToDisplay + "' name='ItemId'  >" + indexToDisplay + "</td>");
+				mappingDetails.append("<td><input type='checkbox' class='chkView' ></td>");
+				mappingDetails.append("<td><input type='text'  class='form-control' value='" + invMet.get(0) + "' name='inventoryName'  ></td>");
+				mappingDetails.append("<td><input type='text'  class='form-control' value='" + invMet.get(1) + "' name='material' ></td>");
+				mappingDetails.append("<td><input type='text'  class='form-control' value='" + type.get(index) + "' name='type' disabled ></td>");
+				mappingDetails.append("<td><input type='text'  class='form-control' value='" + classOrGrade.get(index) + "' name='classOrGrade' disabled ></td>");
+				mappingDetails.append("<td><input type='text'  class='form-control' value='" + category.get(index) + "' name='catogory' disabled ></td>");
+				mappingDetails.append("</tr>");
+
+				indexToDisplay++;
+			}
+			index++;
 		}
 	
 		ArrayList<Valves> valvesData = valvesDao.getValveDetails();
@@ -95,8 +123,8 @@ public class AddInventoryController {
 		StringBuffer valvesDetails = new StringBuffer();
 		int index2 = 1;
 		for(Valves valves : valvesData){
-			valvesDetails.append("<tr>");
-			valvesDetails.append("<td><input type='text' style='width:50px' class='form-control' value='" + index2 + "' name='ItemId'  ></td>");
+			valvesDetails.append("<tr class='lazy'>");
+			valvesDetails.append("<td><input type='hidden' class='form-control' value='" + index2 + "' name='ItemId'  >"+ index2 +"</td>");
 			valvesDetails.append("<td><input type='checkbox' class='chkView' ></td>");
 			valvesDetails.append("<td><input type='text'  class='form-control' value='" + valves.getModel() + "' name='model' ></td>");
 			valvesDetails.append("<td><input type='text'  class='form-control' value='" + valves.getMaterial() + "' name='material' ></td>");
@@ -122,7 +150,7 @@ public class AddInventoryController {
 			
 		}
 		
-		modelAndView.setViewName("inventoryDetails");
+		modelAndView.setViewName("InventoryDetails");
 		modelAndView.addObject("mappingDetails", mappingDetails.toString());
 		modelAndView.addObject("valvesDetails", valvesDetails.toString());
 		modelAndView.addObject("taxesDetails", taxesDetails.toString());

@@ -3,6 +3,7 @@ package com.projectmanager.controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.projectmanager.util.HTMLElements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import com.projectmanager.dao.BOQDetailsDao;
 import com.projectmanager.dao.ProjectDao;
 import com.projectmanager.entity.Project;
+
+import java.util.ArrayList;
 
 @Controller
 @EnableWebMvc
@@ -29,25 +32,33 @@ public class HomeController extends AbstractController {
 	final static String NEW_HOME = "newHome";
 
 	@Override
-	@RequestMapping(value = "/home", method = RequestMethod.POST)
+	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		ModelAndView modelAndView = new ModelAndView(NEW_HOME);
-		String projectIdVal = "";
+		ArrayList<String> projectIdVal = new ArrayList<>();
 
 		projectIdVal = boqDetailsDao.getRecentProject();
 
-		Project project = projectDao.getProject(Integer.parseInt(projectIdVal));
+		int sizeToIterate = projectIdVal.size()>5?5:projectIdVal.size();
 
-		if (!(projectIdVal.equals("") || projectIdVal.equals("0"))) {
-			modelAndView.addObject("projectDesc", project.getProjectDesc());
-			modelAndView.addObject("projectIdVal", projectIdVal);
-			modelAndView.addObject("projectNameVal", project.getProjectName());
-		} else {
-			modelAndView.addObject("projectDesc", "No Recent Project");
-			modelAndView.addObject("projectIdVal", "No Recent Project");
-			modelAndView.addObject("projectNameVal", "No Recent Project");
+		StringBuilder StringToSend = new StringBuilder();
+
+		for(int k=0; k<sizeToIterate; k++)
+		{
+			String template = HTMLElements.CURRENT_PROJECTS;
+
+			Project project = projectDao.getProject(Integer.parseInt(projectIdVal.get(k)));
+
+			template = template.replaceAll("projectNameVal",project.getProjectName());
+			template = template.replaceAll("projectIdVal", String.valueOf(project.getProjectId()));
+			template = template.replaceAll("projectDescVal",project.getProjectDesc());
+
+			StringToSend.append(template);
 		}
+
+
+		modelAndView.addObject("projectList", StringToSend.toString());
 
 		return modelAndView;
 	}

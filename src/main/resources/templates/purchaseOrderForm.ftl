@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>The Project | Forms</title>
+  <title>Hamdule Projects</title>
   <meta name="description" content="The Project a Bootstrap-based, Responsive HTML5 Template">
   <meta name="author" content="author">
 
@@ -59,40 +59,7 @@
       <!-- page wrapper start -->
       <!-- ================ -->
       <div class="page-wrapper">
-        <div class="header-container">
-          <header class="header fixed fixed-desktop clearfix">
-            <div class="container">
-              <div class="col-md-auto hidden-md-down">
-                <div class="header-first clearfix">
-                 <div class="row">
-                   <div class="col-md-8">
-                     <div class="navbar navbar-default navbar-static-top container" style="margin-left: 0px; margin-right: 0px;">
-                      <div class="navbar-header" style="width: 200px;">
-                       <img src="./images/img/Hamdule-Logo1.png" alt="" style="width: 250px;height: 55px;margin-top: 20px;margin-left: -150px;">
-                     </div>
-                   </div>
-                 </div> 
-                 <div class="col-md-2">
-                   <form class="form-horizontal" action="home" method="POST" style="margin-left: 100px;margin-top: 30px;">
-                    <button type="submit" class="btn btn-default btn-animated">Home<i class="fa fa-user"></i></button>
-                  </form>
-                </div>
-                <div class="col-md-2"> 
-                  <form class="form-horizontal" action="logout" method="POST" style="margin-left: 100px;margin-top: 30px;">
-                    <button type="submit" class="btn btn-default btn-animated">Log Out <i class="fa fa-user"></i></button>
-                  </form>
-                </div>
-                <div class="site-slogan">
-                </div>
-              </div>
-            </div>
-
-            <div class="col-auto hidden-md-down">
-            </div>
-          </div>
-        </div>
-      </header>
-    </div>
+        <#include "./header.ftl">
     <section class="main-container">
 
       <div class="container">
@@ -216,7 +183,7 @@
       <div class="subfooter-inner">
         <div class="row">
           <div class="col-md-12">
-            <p class="text-center">Copyright © 2018 The Project. All rights reserved.</p>
+            <p class="text-center">Powered By Social Angels Digital Solution Pvt Ltd.</p>
           </div>
         </div>
       </div>

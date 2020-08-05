@@ -1,13 +1,10 @@
 package com.projectmanager.controllers;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -90,6 +87,9 @@ public class BOQController {
 
 	@Autowired
 	ConfigProperties configProperties;
+
+	@Autowired
+	NotificationUtil notificationUtil;
 
 	ArrayList<Valves> valveDetailsList = null;
 
@@ -250,7 +250,7 @@ public class BOQController {
 	}
 
 	@RequestMapping(value = { "/download" }, method = RequestMethod.POST)
-	protected void generateBOQ(String docNameToDownload, String projectId, HttpServletResponse response) {
+	protected void generateBOQ(String docNameToDownload, String projectId, boolean isOffer, HttpServletResponse response) {
 		byte[] excelByts = null;
 
 		ArrayList<BOQLineData> boqlineData = new ArrayList<BOQLineData>();
@@ -293,7 +293,7 @@ public class BOQController {
 		boqlineData = getBOQLineDataList(material, type, ends, classOrGrade, inventoryName, manifMetod);
 		try {
 			excelByts = writer.writeExcel(boqlineData, size, quantity, supplyRate, erectionRate, supplyAmount,
-					erectionAmount, "", header, false, false);
+					erectionAmount, "", header, isOffer, false);
 			response.setHeader("Content-disposition", "attachment; filename=" + docNameToDownload + ".xls");
 
 			OutputStream out = response.getOutputStream();
@@ -455,24 +455,51 @@ public class BOQController {
 		}
 
 		if (Boolean.valueOf(isOffer) && (venderName != null && !(venderName.isEmpty()))) {
+
 			// Fetch associated email address
-			String sender = userDetailsDao.getEmailAddress((String) session.getAttribute("userName"));
+
+			String userName = (String) session.getAttribute("userName");
+			String sender = userDetailsDao.getEmailAddress(userName);
 
 			VendorDetails vendorDetails = vendorDetailsDao.getVendorDetails(venderName);
-			emailUtils.sendInquiry(sender, vendorDetails.getContactEmail(), excelByts, boqNameRevisionStr);
+
+			//save Inquiry file
+			String pathToAttachment = System.getProperty("java.io.tmpdir") + "/" + userName+"/"+boqNameRevisionStr + ".xls";
+
+			System.out.println("File saved at : "+pathToAttachment);
+			File file = new File(pathToAttachment);
+
+			file.getParentFile().mkdirs();
+
+			FileOutputStream fout = new FileOutputStream(file);
+			fout.write(excelByts);
+			OutputStream out = response.getOutputStream();
+
+			byte[] buffer = excelByts; // use bigger if you want
+			int length = buffer.length;
+
+			System.out.println("Buffer length is : " + length);
+			out.write(buffer, 0, length);
+			out.close();
+			fout.close();
+
+
+			notificationUtil.pushNotification(userName,vendorDetails.getContactEmail(),"Hamdule Projects : Inventory Inquiry", "Greeting of thr day from hamdule Industries. Please find attached the Inventory requirment. PLeaase update the same and respond.",file.getName(),"INBOX", new Date());
+
 		}
+		else
+		{
+			response.setHeader("Content-disposition", "attachment; filename=" + boqNameRevisionStr + ".xls");
 
-		response.setHeader("Content-disposition", "attachment; filename=" + boqNameRevisionStr + ".xls");
+			OutputStream out = response.getOutputStream();
 
-		OutputStream out = response.getOutputStream();
+			byte[] buffer = excelByts; // use bigger if you want
+			int length = buffer.length;
 
-		byte[] buffer = excelByts; // use bigger if you want
-		int length = buffer.length;
-
-		System.out.println("Buffer length is : " + length);
-		out.write(buffer, 0, length);
-		out.close();
-
+			System.out.println("Buffer length is : " + length);
+			out.write(buffer, 0, length);
+			out.close();
+		}
 	}
 
 	protected ArrayList<BOQLineData> getBOQLineDataList(String[] material, String[] type, String[] ends,
@@ -545,6 +572,7 @@ public class BOQController {
 				standardype = configProperties.getStandardTypePorperties(((String) key));
 			}
 		}
+
 		BOQLineData boqLineData = new BOQLineData();
 
 		boqLineData.setStdLine("Standard/Type: " + (standardype.isEmpty() ? inventoryName : standardype));

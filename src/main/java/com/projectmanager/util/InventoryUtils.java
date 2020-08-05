@@ -247,7 +247,7 @@ public class InventoryUtils {
 		return invoiceNamesString.toString();
 	}
 
-	public String getChallanHTML(int noOfChallan, ChallanDetails challanDetails, ArrayList<StringBuffer> lineItemDataList)
+	public String getChallanHTML(int noOfChallan, ChallanDetails challanDetails, ArrayList<StringBuffer> lineItemDataList, UserDetails userDetails)
 	{
 		String challanHTML = "";
 		StringBuffer challanHTMLBuffer = new StringBuffer();
@@ -277,9 +277,9 @@ public class InventoryUtils {
 				stringToadd = stringToadd.replace("poNo",challanDetails.getPoNo());
 				stringToadd = stringToadd.replace("date",LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yy")));
 				stringToadd = stringToadd.replace("poDate",challanDetails.getPoDate());
-				stringToadd = stringToadd.replace("from1",challanDetails.getReceivedFrom());
+				stringToadd = stringToadd.replace("from1",userDetails.getFirstName() + " " + userDetails.getLastName());
 				stringToadd = stringToadd.replace("consignee1",challanDetails.getConsignee());
-				stringToadd = stringToadd.replace("from2","");
+				stringToadd = stringToadd.replace("from2",challanDetails.getReceivedFrom());
 				stringToadd = stringToadd.replace("consignee2","");
 				stringToadd = stringToadd.replace("from3","");
 				stringToadd = stringToadd.replace("consignee3","");
