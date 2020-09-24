@@ -263,7 +263,6 @@
     </div>
   </div>
 </div>
-
 <footer id="footer" class="clearfix ">
   <div class="subfooter">
     <div class="container">
@@ -337,12 +336,18 @@
      success : function(data) 
      {
       var venderName = $('[name="vendorNameStr"]').val();
-      $("[name='vendorName']").append("<option value=" + venderName + ">" + venderName + "</option>");
+      //$("[name='vendorName']").append("<option value=" + venderName + ">" + venderName + "</option>");
 
-      document.getElementById("textOverlaySearch").style.display = "none";
+      if(data)
+      {
+        alert('Vendor has been added successfully');
+      }
+      else
+      {
+        alert('Error adding Vendor. Please verify, the Vendor is not already added or try again..!!');
+      }
 
-      alert('Vender has been added successfully');              
-    }
+     }
   });
     hideLoading();
   }

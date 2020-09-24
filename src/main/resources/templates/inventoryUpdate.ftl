@@ -110,44 +110,10 @@
                             </tbody>
                         </table>
                     </dir>
-                    <div class="form-row border border-info" style="width:115%; margin-left: -7%; padding : 1%;">
-                        <div class="col-md-3 ">
-                            <div class="ph-20 feature-box text-center object-non-visible"
-                                 data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-                                <br>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="generateChallan" value="">
-                                    <label class="form-check-label">
-                                        Generate Challan
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 ">
-                            <div class="ph-20 feature-box text-center object-non-visible"
-                                 data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-                                <br>
-                                <div class="form-check">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 ">
-                            <div class="ph-20 feature-box text-center object-non-visible"
-                                 data-animation-effect="fadeInDownSmall" data-effect-delay="100">
-                                <br>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="generateInvoice" value="">
-                                    <label class="form-check-label">
-                                        Generate Invoice
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                         <input type="hidden" name="generateChallan" id="gC1" value=""/>
                         <input type="hidden" name="generateInvoice" id="gI1" value=""/>
                         <input type="hidden" name="addBillDetails" id="aBD" value=""/>
                         <input type="hidden" name="project" id="project" value=""/>
-                    </div>
                     <div class="row" style="margin-left: 0%;">
                         <div class="col-md-3">
                             <div class="ph-20 feature-box text-center">
@@ -157,17 +123,12 @@
                         </div>
                         <div class="col-md-3 ">
                             <div class="ph-20 feature-box text-center">
-                                <br>
+                                <input class="form-check-input" type="checkbox" id="generateChallan" value="">
+                                <label class="form-check-label">
+                                    Generate Challan
+                                </label>
                                 <button type="button" onClick="hideOthers('challan')" data-toggle="collapse"
                                         data-target="#challan" class="btn btn-default">Challan Details
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-3 ">
-                            <div class="ph-20 feature-box text-center">
-                                <br>
-                                <button type="button" onClick="hideOthers('invoice')" data-toggle="collapse"
-                                        data-target="#invoice" class="btn btn-default">Invoice Details
                                 </button>
                             </div>
                         </div>
@@ -216,51 +177,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse border border-info" id="invoice"
-                         style="width:115%; margin-left: -8%; padding: 1%;">
-                        <label><h3></h3></label>
-                        <div class="form-row">
-                            <div class="form-group col-md-3">
-                                <label>Contact Name</label>
-                                <input type="text" class="form-control" name="contactName">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Mobile No</label>
-                                <input type="text" class="form-control" name="mobileNo">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Addressed To</label>
-                                <input type="text" class="form-control" name="addressedto1">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Order Date</label>
-                                <input type="text" class="form-control" name="orderDate">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-3">
-                                <label>Email</label>
-                                <input type="text" class="form-control" name="emailAddress">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Invoice Type</label>
-                                <select class="form-control" name="invoiceType" id="invoiceType">
-                                    <option></option>
-                                    <option value="Supply">Supply</option>
-                                    <option value="Labour">Labour</option>
-                                    <option value="Supply&Labour">Supply&Labour</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Hsn/Sac</label>
-                                <input type="text" class="form-control" name="hsnOrSac">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <br/>
-                            </div>
-                            <input type="hidden" name="orderNo" value=""/>
-                        </div>
-                    </div>
                 </form>
                 <div class="separator object-non-visible mt-10 animated object-visible fadeIn"
                      data-animation-effect="fadeIn" data-effect-delay="100"></div>
@@ -300,7 +216,6 @@
                     </div>
                 </div>
                 <div class="row" style="margin-left: -11%;">
-
                 </div>
             </div>
         </section>
@@ -435,15 +350,13 @@
 
     </script>
     <script type="text/javascript">
-  function populatePODetails(poNo)
-  {
-   $.ajax({
-     type : 'POST',
-     data :  {'poNumber' : poNo},
-     url : 'getPoDetails',
-     success : function(data) {
-      
-      $("[name='orderNo']")[0].value = poNo;
+      function populatePODetails(poNo)
+      {
+       $.ajax({
+         type : 'POST',
+         data :  {'poNumber' : poNo},
+         url : 'getPoDetails',
+         success : function(data) {
 
       var htmlData = data.split('::');
       $('#poDetailsTable').html(htmlData[0]);

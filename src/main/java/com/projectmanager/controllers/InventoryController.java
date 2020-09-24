@@ -125,7 +125,7 @@ public class InventoryController {
 	protected ModelAndView updateInventory(ChallanDetails challanDetails, String[] inventoryName, String[] material,
 			String[] type, String[] manifMethod, String[] gradeOrClass, String[] ends, String[] size, int[] quantity,
 			String[] purchaseRate, /* String[] rate, */ String[] project, String[] location, String[] status,
-			String invoiceType, TaxInvoiceDetails taxInvoiceDetails, BillDetails billDetails,
+			String invoiceType, BillDetails billDetails,
 			AccessoryDetails accessoryDetails, String generateChallan, String generateInvoice, String addAccessory,
 			String addBillDetails, HttpSession session) {
 
@@ -143,8 +143,6 @@ public class InventoryController {
 		}
 
 		int projectId = projectDao.getProjectId(project[0]);
-
-		taxInvoiceDetails.setProjectName(project[0]);
 
 		StringBuffer lineItemData = new StringBuffer();
 
@@ -177,107 +175,29 @@ public class InventoryController {
 
 			System.out.println("inventoryRowId is : " + inventoryRowId);
 
-			if (inventoryRowId != 0) {
+			if (inventoryRowId != 0 && generateInvoice !="1") {
 
 				inventory.setInventoryRowId(inventoryRowId);
 
 				int availableQuantity = inventoryDao.getAvailableQuantity(inventory);
 
-				if (project[0] != null && project[0] != "") {
+				int assignedQty = inventoryDao.getQuantityByStatus(inventory, status[i], true);
+				System.out.println("assignedQty is : " + assignedQty);
 
-					int assignedQty = inventoryDao.getQuantityByStatus(inventory, status[i], true);
+				inventory.setQuantity(assignedQty + Integer.valueOf(quantity[i]));
 
-					System.out.println("assignedQty is : " + assignedQty);
-
-					switch (status[i]) {
-					case "assigned":
-						inventory.setQuantity(assignedQty + Integer.valueOf(quantity[i]));
-						break;
-					case "available":
-						// Reduce the assigned quantity
-						inventory.setQuantity(assignedQty - Integer.valueOf(quantity[i]));
-
-						// Add new entry for update existing one without project
-						Inventory availableInventory = inventory.copyObject(inventory);
-
-						InventorySpec invSpec = inventoryUtils.copyInventorySpec(inventory.getInventorySpec());
-						invSpec.setAssignedProject("");
-						invSpec.setStatus("available");
-
-						availableInventory.setInventorySpec(invSpec);
-
-						int availableInventoryRowId = inventoryDao.isEntityPresent(availableInventory);
-
-						if (availableInventoryRowId == 0) {
-							// Inventory is not available. Add a new entry to DB
-							availableInventory.setQuantity(quantity[i]);
-							availableInventory.setInventoryRowId(inventoryDao.getLatestInventoryEntryNo() + 1);
-
-						} else {
-							// Inventory is available. Just increase the
-							// quantity
-							availableInventory.setQuantity(availableQuantity + quantity[i]);
-						}
-
-						try {
-							inventoryDao.saveInventory(availableInventory);
-						} catch (Exception ex) {
-							System.out.println("calling update");
-							inventoryDao.updateWhenSaveFailed(availableInventory);
-						}
-
-						break;
-					case "delivered":
-						// Reduce the assigned quantity
-						inventory.setQuantity(assignedQty - Integer.valueOf(quantity[i]));
-
-						// Add new entry for update existing one without project
-						Inventory deliveredInventory = inventory.copyObject(inventory);
-
-						InventorySpec invSpec2 = inventoryUtils.copyInventorySpec(inventory.getInventorySpec());
-
-						invSpec2.setAssignedProject(inventory.getInventorySpec().getAssignedProject());
-						invSpec2.setStatus("delivered");
-
-						deliveredInventory.setInventorySpec(invSpec2);
-
-						int deliveredInventoryRowId = inventoryDao.isEntityPresent(deliveredInventory);
-
-						if (deliveredInventoryRowId == 0) {
-							// Inventory is not available. Add a new entry to DB
-							deliveredInventory.setQuantity(quantity[i]);
-							deliveredInventory.setInventoryRowId(inventoryDao.getLatestInventoryEntryNo() + 1);
-
-						} else {
-							// Inventory is available. Just increase the
-							// quantity
-							deliveredInventory.setQuantity(availableQuantity + quantity[i]);
-						}
-
-						try {
-							inventoryDao.saveInventory(deliveredInventory);
-						} catch (Exception ex) {
-							System.out.println("calling update");
-							inventoryDao.updateWhenSaveFailed(deliveredInventory);
-						}
-
-						break;
-					}
-
-				} else {
-					inventory.setQuantity(quantity[i]);
-				}
+				inventoryDao.updateWhenSaveFailed(inventory);
 
 			} else {
 				inventoryRowId = inventoryDao.getLatestInventoryEntryNo() + 1;
 				inventory.setInventoryRowId(inventoryRowId);
-			}
 
-			try {
-				inventoryDao.saveInventory(inventory);
-			} catch (Exception ex) {
-				System.out.println("calling update");
-				inventoryDao.updateWhenSaveFailed(inventory);
+				try {
+					inventoryDao.saveInventory(inventory);
+				} catch (Exception ex) {
+					System.out.println("calling update inventory not present");
+					ex.printStackTrace();
+				}
 			}
 
 			String projectName = project[0];
@@ -292,7 +212,6 @@ public class InventoryController {
 			if (generateChallan.equals("1")) {
 				// get projectId before saving challan details.
 
-				taxInvoiceDetails.setProjectId(projectId);
 				challanDetails.setProjectId(String.valueOf(projectId));
 				ArrayList<String> lrList = (ArrayList<String>) challanDao.getLrNo(String.valueOf(projectId));
 				Collections.sort(lrList);
@@ -347,84 +266,6 @@ public class InventoryController {
 		String invoiceNo = null;
 		String invoiceDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
-		if (generateInvoice.equals("1")) {
-
-			ProjectDetails projectDetails = projectDetailsDao.getProjectDetails(projectId);
-
-			String lasttaxInvoiceNo = taxInvoiceDetailsDao.getLastTaxIvoiceNo();
-
-			int lastNo = 0;
-			if (lasttaxInvoiceNo.length() > 0) {
-				lastNo = Integer.parseInt(lasttaxInvoiceNo.substring(lasttaxInvoiceNo.lastIndexOf("/") + 1));
-			}
-
-			invoiceNo = "Invoice/" + clientShortName.replaceAll(" ","_") + "/" + String.valueOf(lastNo + 1);
-			taxInvoiceDetails.setInvoiceNo(invoiceNo);
-			taxInvoiceDetails.setTaxInvoiceNo(invoiceNo);
-
-			taxInvoiceDetails.setOrderNo(projectDetails.getPoNumber());
-
-			taxInvoiceDetails.setTaxInvoiceDate(invoiceDate);
-
-			String totalAmount = getTotalAmount(purchaseRate, quantity);
-
-			// Add if any miscellaneous charges are included
-			String miscCharges = taxInvoiceDetails.getMiscCharges();
-
-			String userName = (String) session.getAttribute("userName");
-
-			String totalInvoiceAmount = createAnnexture(String.valueOf(projectId), material, type, ends, gradeOrClass, inventoryName, manifMethod,
-					size, quantity, invoiceNo, taxInvoiceDetails.getInvoiceType(), userName);
-
-			double totalAmountInt = Double.parseDouble(totalInvoiceAmount);
-			if (miscCharges != null && !("".equals(miscCharges))) {
-				totalAmountInt = totalAmountInt + Double.parseDouble(miscCharges);
-			}
-
-			TaxesEntity taxes = taxesDao.getTaxesDetails().get(0);
-
-			double cGST = totalAmountInt * taxes.getcGst() / 100;
-			double sGST = totalAmountInt * taxes.getsGst() / 100;
-
-			taxInvoiceDetails.setcGst(String.valueOf(cGST));
-
-			Double doubleVal = totalAmountInt + cGST + sGST;
-
-			String amountsToWord = numberWordConverter.convert((int) Math.round(doubleVal));
-
-			if (amountsToWord.length() > 40) {
-				taxInvoiceDetails.setAmtInwrd1((String) amountsToWord.substring(0, 39));
-				taxInvoiceDetails.setAmtInwrd2((String) amountsToWord.substring(40));
-			} else {
-				taxInvoiceDetails.setAmtInwrd1(amountsToWord);
-				taxInvoiceDetails.setAmtInwrd2("");
-			}
-			taxInvoiceDetails.setRate(totalInvoiceAmount);
-			taxInvoiceDetails.setTotal(totalInvoiceAmount);
-
-			String sender = userDetailsDao.getEmailAddress(userName);
-
-			taxInvoiceGenerator.generateAndSendTaxInvoice(taxInvoiceDetails, sender, userName);
-
-			try {
-				for (int i = 0; i < receivedInventoryList.size(); i++) {
-
-					Inventory inventory = receivedInventoryList.get(i);
-					inventory.setInvoiceNo(invoiceNo);
-					inventory.setReceivedDate(invoiceDate);
-
-					try {
-						inventoryDao.updateWhenSaveFailed(inventory);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 
 		String userName = (String)session.getAttribute("userName");
 		UserDetails userDetails = userDetailsDao.getuSerDetails(userName);
@@ -441,8 +282,6 @@ public class InventoryController {
             view.addObject("itemList"+l, lineItemDataList.get(l-1).toString().replaceAll("~",""));
             view.addObject("challanNo"+l, challanDetails.getInventoryRowId()+" - "+l+1+"/"+noOfChallan);
         }
-
-
 
 		view.addObject("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yy")));
 		view.addObject("consignee1", challanDetails.getConsignee());

@@ -1175,7 +1175,7 @@ function cleanArray(actual)
         var amountPrnding = parseFloat(totalAmount) - parseFloat(receivedAmount); 
         $('#paymentDetailsBody').append('<tr><th>'+idNum+'</th><th>'+receivedAmount+'</th><th>'+paymentMode+'</th><th>'+currentDate+'</th></tr>');
       }
-
+    alert('Payment details has been added successfully..!!');
     }
   });
     hideLoading();
@@ -1264,7 +1264,7 @@ function cleanArray(actual)
       }
       catch(err)
       {
-        console.log('Error occured while generating BOQ : '+err);
+        console.log('Error occurred while generating BOQ : '+err);
       }
 
       var boqList = $('.revisionSection')[0].options; 

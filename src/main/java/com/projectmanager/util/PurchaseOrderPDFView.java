@@ -43,8 +43,8 @@ public class PurchaseOrderPDFView extends AbstractView {
     TaxesDao taxesDao;
 
     @Override
-    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
-                                           HttpServletResponse response) throws Exception {
+    public void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
+                                        HttpServletResponse response) throws Exception {
 
         PODetails poDetails = (PODetails) model.get("poDetails");
         String poLineDetails = (String) model.get("poLineDetails");
@@ -69,17 +69,17 @@ public class PurchaseOrderPDFView extends AbstractView {
         }
 
         //Save poDetails.getPoNumber() + ".pdf" in io.temp
-        try
-        {
-            String userName = (String)model.get("userName");
-            String destination = System.getProperty("java.io.tmpdir") + "/"+userName+"/"+poDetails.getPoNumber() + ".pdf";
+        try {
+            String userName = (String) model.get("userName");
+            String destination = System.getProperty("java.io.tmpdir") + "/" + userName + "/"
+                    + poDetails.getPoNumber().replace("/", "_") + ".pdf";
 
             File fileToSave = new File(destination);
             fileToSave.getParentFile().mkdirs();
 
             FileOutputStream fOut = new FileOutputStream(fileToSave);
-        
-              generatePO("27440913446-V", "27AEBPH1001B1ZM", poDetails.getPoNumber(), poDetails.getPoDate(),
+
+            generatePO("27440913446-V", "27AEBPH1001B1ZM", poDetails.getPoNumber(), poDetails.getPoDate(),
                     poDetails.getVendorName(), "", poDetails.getContactName(), poDetails.getContactNumber(),
                     poDetails.getContactEmail(), make, description, quantity, unitPrice, terms, response, fOut);
         } catch (Exception ex) {
@@ -91,7 +91,7 @@ public class PurchaseOrderPDFView extends AbstractView {
     public void generatePO(String vatTin, String gstNo, String purhaseOrderNo, String purhaseOrderDate,
                            String venderName, String venderLocation, String receiverName, String receiverNo, String receiverEmail,
                            String[] make, String[] description, String[] quantity, String[] unitPrice, String[] term,
-                           HttpServletResponse response, FileOutputStream fOut ) {
+                           HttpServletResponse response, FileOutputStream fOut) {
 
         try {
 
@@ -273,7 +273,7 @@ public class PurchaseOrderPDFView extends AbstractView {
             String sGst = "";
             String iGst = "";
 
-            TaxesEntity taxes =  taxesDao.getTaxesDetails().get(0);
+            TaxesEntity taxes = taxesDao.getTaxesDetails().get(0);
 
             int cGstVal = taxes.getcGst();
             int sGstVal = taxes.getsGst();
@@ -298,13 +298,10 @@ public class PurchaseOrderPDFView extends AbstractView {
                 PdfPCell r3c7 = null;
                 PdfPCell r3c8 = null;
 
-                if(gstNo.startsWith("27"))
-                {
+                if (gstNo.startsWith("27")) {
                     r3c7 = createNewCell(new Paragraph(cGst, blackCalibri9));
                     r3c8 = createNewCell(new Paragraph(sGst, blackCalibri9));
-                }
-                else
-                {
+                } else {
                     r3c7 = createNewCell(new Paragraph("-", blackCalibri9));
                     r3c8 = createNewCell(new Paragraph(iGst, blackCalibri9));
                 }
@@ -324,7 +321,7 @@ public class PurchaseOrderPDFView extends AbstractView {
 
                 cGstTotal += Double.parseDouble(cGst);
                 sGstTotal += Double.parseDouble(sGst);
-                iGstTotal +=  Double.parseDouble(iGst);
+                iGstTotal += Double.parseDouble(iGst);
 
                 subTotal += Double.parseDouble(total);
 
@@ -364,13 +361,11 @@ public class PurchaseOrderPDFView extends AbstractView {
             PdfPCell r4c8 = null;
             PdfPCell r4c9 = null;
 
-            if(gstNo.startsWith("27")) {
+            if (gstNo.startsWith("27")) {
                 r4c7 = createNewCell(new Paragraph(String.valueOf(cGstTotal), blackCalibri9));
                 r4c8 = createNewCell(new Paragraph(String.valueOf(sGstTotal), blackCalibri9));
                 r4c9 = createNewCell(new Paragraph("", blackCalibri9));
-            }
-            else
-            {
+            } else {
                 r4c7 = createNewCell(new Paragraph("", blackCalibri9));
                 r4c8 = createNewCell(new Paragraph("", blackCalibri9));
                 r4c9 = createNewCell(new Paragraph(String.valueOf(iGstTotal), blackCalibri9));
@@ -402,12 +397,9 @@ public class PurchaseOrderPDFView extends AbstractView {
 
             String amountInWords = "";
 
-            if(gstNo.startsWith("27"))
-            {
-                 amountInWords = numberWordConverter.convert((int) Math.round(subTotal + cGstTotal + sGstTotal));
-            }
-            else
-            {
+            if (gstNo.startsWith("27")) {
+                amountInWords = numberWordConverter.convert((int) Math.round(subTotal + cGstTotal + sGstTotal));
+            } else {
                 amountInWords = numberWordConverter.convert((int) Math.round(subTotal + iGstTotal));
             }
 
@@ -428,11 +420,9 @@ public class PurchaseOrderPDFView extends AbstractView {
             PdfPCell t3r1c4 = createNewCell(70);
 
 
-
-
-            t3r1c4.addElement(new Paragraph("\u20B9    "+String.valueOf(subTotal), arial));
-            t3r1c4.addElement(new Paragraph("\u20B9    "+String.valueOf(cGstTotal + sGstTotal), arial));
-            t3r1c4.addElement(new Paragraph("\u20B9    "+String.valueOf(subTotal + cGstTotal + sGstTotal), arial));
+            t3r1c4.addElement(new Paragraph("\u20B9    " + String.valueOf(subTotal), arial));
+            t3r1c4.addElement(new Paragraph("\u20B9    " + String.valueOf(cGstTotal + sGstTotal), arial));
+            t3r1c4.addElement(new Paragraph("\u20B9    " + String.valueOf(subTotal + cGstTotal + sGstTotal), arial));
             t3r1c4.setHorizontalAlignment(Element.ALIGN_CENTER);
             t3r1c4.setVerticalAlignment(Element.ALIGN_MIDDLE);
 

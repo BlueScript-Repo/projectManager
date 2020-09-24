@@ -124,16 +124,13 @@
      </div>
    </div>
  </div>
-
  <div class="tab-pane fade " id="htab3" role="tabpanel">                  
   <div class="row">
     <div class="col-md-12">
-
      <form id="updateTaxesDetails" action="updateTaxesDetails" method="POST">
       ${taxesDetails}
        <input id="updateTaxesBtn" type="submit" class="btn btn-primary mt-5" value="Update">
      </form>
-
    </div>
  </div>
 </div>

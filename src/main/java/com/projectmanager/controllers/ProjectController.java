@@ -12,6 +12,7 @@ import com.projectmanager.dao.*;
 import com.projectmanager.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,6 +24,7 @@ import com.projectmanager.excel.ExcelReader;
 import com.projectmanager.model.FilePojo;
 import com.projectmanager.util.InventoryUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -185,9 +187,27 @@ public class ProjectController {
 		return mav;
 	}
 
+	@RequestMapping(value="/test2")
+	public String showTestPage2(HttpServletRequest request, Project project) {
+		String param1 = (String) request.getAttribute("param1");
+		String param2 = (String) request.getAttribute("param2");
+
+		System.out.println("project is : "+project.toString());
+
+		System.out.println("param1 is : "+ param1);
+		System.out.println("param3 is : "+ param2);
+
+		return "testPageView";
+	}
+
 	@RequestMapping(value = "/projectDetails", method = { RequestMethod.POST, RequestMethod.GET })
-	protected ModelAndView projectDetails(Project project, RedirectAttributes redirectAttributes, HttpSession session) throws Exception
+	protected ModelAndView projectDetails(Project project, RedirectAttributes redirectAttributes, HttpSession session, HttpServletRequest request, Model model) throws Exception
 	{
+
+		if(project.getProjectDesc()==null)
+		{
+			project = projectDao.getProject(project.getProjectId());
+		}
 
 		String userName = (String) session.getAttribute("userName");
 
@@ -435,12 +455,18 @@ public class ProjectController {
 	}
 
 	@RequestMapping(value = "/saveVendor", method = RequestMethod.POST)
-	protected @ResponseBody void saveVendor(VendorDetails vendorDetails) {
-		try {
+	protected @ResponseBody boolean saveVendor(VendorDetails vendorDetails)
+	{
+		boolean vendorSaved = true;
+		try
+		{
 			vendorDetailsDao.saveVendorDetails(vendorDetails);
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			vendorSaved = false;
 		}
+
+		return vendorSaved;
 	}
 
 	@RequestMapping(value = "/getVendors", method = { RequestMethod.POST, RequestMethod.GET })

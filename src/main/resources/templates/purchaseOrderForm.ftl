@@ -297,7 +297,6 @@
 
       document.getElementById("textOverlaySearch").style.display = "none";     			       
     }
-    hideLoading();
   });
 
 
@@ -357,8 +356,10 @@
       {
        var venderName = vList[i];
 
+       venderName = venderName.trim();
+
        if(venderName != "")
-        $("[name='vendorName']").append("<option value=" + venderName + ">" + venderName + "</option>");
+        $("[name='vendorName']").append("<option value='" + venderName + "'>" + venderName + "</option>");
       }
   }
 
