@@ -31,7 +31,7 @@
   function hideOthers1(idToBeOpen)
   {
 
-    var idVals = ["aitem","citem"];
+    var idVals = ["aitem","citem","mitem"];
 
     for(var i=0; i< idVals.length; i++)
     {

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import com.projectmanager.dao.*;
 import com.projectmanager.entity.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ import com.projectmanager.entity.BOQLineData;
 import com.projectmanager.entity.BillDetails;
 import com.projectmanager.entity.ChallanDetails;
 import com.projectmanager.entity.Inventory;
+import com.projectmanager.entity.InventoryMuster;
 import com.projectmanager.entity.InventorySpec;
 import com.projectmanager.entity.Mappings;
 import com.projectmanager.entity.Project;
@@ -307,6 +309,38 @@ public class InventoryController {
 
 		// Generate the Invoice if this is not a return i.e. taxInvoiceNo is
 		// null.
+		
+		 for(int i= 0 ; i<inventoryName.length;i++){
+        	 InventoryMuster invenMust = new InventoryMuster();
+             invenMust.setInventoryName(inventoryName[i]);
+             invenMust.setMaterial(material[i]);
+             invenMust.setManifMethod(manifMethod[i]);
+             invenMust.setType(type[i]);
+             invenMust.setGradeOrClass(gradeOrClass[i]);
+             invenMust.setEnds(ends[i]);
+             invenMust.setSize(size[i]);
+             
+             if (generateChallan.equals("1")) {
+             invenMust.setConsignee(challanDetails.getConsignee());
+             invenMust.setChallanNo(challanDetails.getInventoryRowId() + " - " + "1/" + noOfChallan);
+             }
+             else {
+                 invenMust.setConsignee("");
+                 invenMust.setChallanNo("");
+                 }
+             invenMust.setAssignedProject(project[i-i]);
+             invenMust.setQuantity(quantity[i]);
+             invenMust.setReceiveDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+             invenMust.setLocation(location[i]);
+           //  invenMust.setMaterialSpecs(materialSpecs[i]);
+             try {
+                 
+                 inventoryDao.saveReveivedInventory(invenMust);
+               } catch (Exception ex) {
+                   System.out.println("calling update inventory not present");
+                   ex.printStackTrace();
+               }
+        }
 
 		return view;
 	}
