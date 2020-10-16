@@ -84,6 +84,9 @@ public class ProjectController {
 	@Autowired
 	ExcelReader reader;
 
+	@Autowired
+	DesignOfferDao designOfferDao;
+
 	// private static final String updateProjectviewName = "updatedDetails";
 	private static final String updateProjectviewName = "newUpdatedDetails";
 	private static final String searchProjectviewName = "searchProjectResult";
@@ -431,6 +434,20 @@ public class ProjectController {
 				mav.addObject("showInvoiceSection","display:none;");
 				mav.addObject("showInventorySection","display:none;");
 		}
+
+
+		//set DesignOffer Versions
+
+		ArrayList<String> docNoList = designOfferDao.getLatestAssociatedDocNoForProject(projectId);
+
+		StringBuilder designOfferOpt = new StringBuilder();
+		for(String docNo : docNoList)
+		{
+			designOfferOpt.append("<option value='"+docNo+"'>"+docNo+"<option>");
+		}
+
+		mav.addObject("designOfferVersions", designOfferOpt.toString());
+
 		return mav;
 	}
 

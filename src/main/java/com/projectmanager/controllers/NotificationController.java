@@ -1,11 +1,16 @@
 package com.projectmanager.controllers;
 
-import com.projectmanager.dao.NotificationDao;
-import com.projectmanager.dao.UserDetailsDao;
-import com.projectmanager.entity.Notifications;
-import com.projectmanager.entity.UserDetails;
-import com.projectmanager.util.EmailUtils;
-import org.apache.commons.io.IOUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,14 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import com.projectmanager.dao.NotificationDao;
+import com.projectmanager.dao.UserDetailsDao;
+import com.projectmanager.entity.Notifications;
+import com.projectmanager.util.EmailUtils;
 
 
 @EnableWebMvc

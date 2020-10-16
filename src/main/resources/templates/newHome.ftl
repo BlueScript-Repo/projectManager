@@ -336,6 +336,7 @@
      success : function(data) 
      {
       var venderName = $('[name="vendorNameStr"]').val();
+
       //$("[name='vendorName']").append("<option value=" + venderName + ">" + venderName + "</option>");
 
       if(data)
@@ -348,6 +349,7 @@
       }
 
      }
+
   });
     hideLoading();
   }

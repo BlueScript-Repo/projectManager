@@ -33,6 +33,7 @@ public class InventoryDao {
 			 session.flush();
 		} catch (Exception hibernateException) 
 		{
+			hibernateException.printStackTrace();
 			throw hibernateException;
 		}
 		return inventory.getInventoryRowId();
@@ -144,7 +145,7 @@ public class InventoryDao {
 		return availableQuantity;
 	}
 
-	public int isEntityPresent(Inventory inventory, String statusTo) {
+	public int isEntityPresent(Inventory inventory, String statusTo, boolean noInvoice) {
 		int associatedRowId = 0;
 		InventorySpec inventorySpec = inventory.getInventorySpec();
 
@@ -157,12 +158,21 @@ public class InventoryDao {
 				+ "invD.inventorySpec.gradeOrClass = '" + inventorySpec.getGradeOrClass() + "' and  "
 				+ "invD.inventorySpec.size = '" + inventorySpec.getSize() + "' and  " 
 				+ "invD.inventorySpec.assignedProject = '" + inventorySpec.getAssignedProject() + "' and  " 
-				+ "invD.inventorySpec.ends = '"	+ inventorySpec.getEnds() + "' and  "
-				+ "invD.invoiceNo is null ";
+				+ "invD.inventorySpec.ends = '"	+ inventorySpec.getEnds() +"'";
+
+		if(noInvoice)
+		{
+			selectHql = selectHql + " and invD.invoiceNo is null";
+		}
+		else
+		{
+			selectHql = selectHql + " and invD.invoiceNo is not null";
+		}
+
 		
 		if(!statusTo.equals("%%"))
 		{
-			selectHql = selectHql + "and invD.inventorySpec.status = '" + statusTo + "'";
+			selectHql = selectHql + " and invD.inventorySpec.status = '" + statusTo + "'";
 		}
 		
 		
@@ -182,7 +192,7 @@ public class InventoryDao {
 	}
 
 	public int isEntityPresent(Inventory inventory) {
-		return isEntityPresent(inventory, "%%");
+		return isEntityPresent(inventory, "%%", true);
 	}
 
 	@Transactional
