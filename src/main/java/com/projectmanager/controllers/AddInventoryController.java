@@ -51,7 +51,7 @@ public class AddInventoryController {
 		ArrayList<ProductDefinition> products = productDefinitionDao.getAllProductDefinition();
 
 		StringBuffer mappingDetails = new StringBuffer();
-		int indexToDisplay = 0;
+		int indexToDisplay = 1;
 		for(ProductDefinition definition : products)
 		{
 			mappingDetails.append("<tr class='lazy' >");
@@ -60,10 +60,11 @@ public class AddInventoryController {
 			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getProductId().getProduct() 				 + "' name='product'  ></td>");
 			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getProductId().getMaterialOfConstruction() + "' name='materialOfConstruction' ></td>");
 			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getProductId().getManufactureMethod() 		 + "' name='manufactureMethod'  ></td>");
-			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getClassOrGrade() 							 + "' name='classOrGrade'  ></td>");
+			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getClassOrSch() 							 + "' name='classOrSch'  ></td>");
 			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getMaterialSpecs() 						 + "' name='materialSpecs'  ></td>");
 			mappingDetails.append("<td><input type='text'  class='form-control' value='" + definition.getStandardType() 						 + "' name='standardType'  ></td>");
 			mappingDetails.append("</tr>");
+			indexToDisplay++;
 
 		}
 
@@ -209,246 +210,263 @@ public class AddInventoryController {
 
 		for(ProductDetailsModel productDetails: userRolesGUIBeans)
 		{
+			String product = productDetails.getProduct();
+			String moc= productDetails.getMaterialOfConstruct();
+			String constructType = productDetails.getConstructType();
+			String materialSpecs = productDetails.getMaterialSpec();
+			String classOrSch = productDetails.getClassOrSch();
+			String standardType = productDetails.getStandardType();
+
+
+			ArrayList<ProductDefinition> listOfProductDetails = productDefinitionDao.getProductDetails(product, moc,constructType);
+
+			if(listOfProductDetails.size()> 0){
+
+				for(ProductDefinition productDefinition :listOfProductDetails){
+					String standardTypes = productDefinition.getStandardType();
+					String classOrSchs = productDefinition.getClassOrSch();
+					String materialSpec = productDefinition.getMaterialSpecs();
+
+					String newForMaterialSpecs = materialSpec + "," + materialSpecs;
+					String newFroClassOrSch =  classOrSchs+ "," + classOrSch;
+					String newForStandaerdType = standardTypes+ ","+ standardType;
+
+					productDefinitionDao.updateProductDefination(product,moc,constructType,newForMaterialSpecs,newFroClassOrSch,newForStandaerdType);
+				}
+
+			}else{
+
 			ProductDefinition productDefinition = new ProductDefinition();
-			productDefinition.setClassOrGrade(productDetails.getClassOrSch());
+			productDefinition.setClassOrSch(productDetails.getClassOrSch());
 			productDefinition.setMaterialSpecs(productDetails.getMaterialSpec());
 			productDefinition.setStandardType(productDetails.getStandardType());
 			productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
 
-			productDefinitionDao.saveProductDefinition(productDefinition);
+
+			productDefinitionDao.saveProductDefinition(productDefinition);}
 		}
 
-		return "";
+		return decodedJson;
 	}
 
-	@PostMapping("/updateMappingDetails")
-	public @ResponseBody String updateMappingDetails(@RequestBody String dataArrayToSend) throws UnsupportedEncodingException, JsonMappingException, JsonProcessingException{
-		
-		
-		String decodedJson = java.net.URLDecoder.decode(dataArrayToSend, "UTF-8");
-	      ObjectMapper jacksonObjectMapper = new ObjectMapper(); // This is Jackson
-	      List<InventoryMappingModel> userRolesGUIBeans =  jacksonObjectMapper.readValue(decodedJson, new TypeReference<List<InventoryMappingModel>>(){});
-		
-	      
-	      for(InventoryMappingModel InventoryModel:userRolesGUIBeans)
-	      {
-	    	  ArrayList<String> ArrayOfType = new ArrayList<String>() ;
-	    	  ArrayList<String> ArrayOfClassGrade = new ArrayList<String>();
-	    	  ArrayList<String> ArrayOfCatogory = new ArrayList<String>();
-	    	  
-	    	  String InventoryName = InventoryModel.getInventoryName();
-	    	  String Material = InventoryModel.getMaterial();
-	    	  String Type = InventoryModel.getType();
-	    	  String ClassOrGrade = InventoryModel.getClassOrGrade();
-	    	  String Catogory = InventoryModel.getCatogory();
-	    	  
-	  
-	    	  ArrayList<Mappings> ListOfAllMappingDetails = mappingsDao.getMappingDetails(InventoryName,Material);
-	    	  
-	    	  
-	    	  for(Mappings MappData:ListOfAllMappingDetails)
-	    	  
-	    	  {
-	    		  ArrayOfType.add(MappData.getType());
-	    		  ArrayOfClassGrade.add(MappData.getClassOrGrade());
-	    		  ArrayOfCatogory.add(MappData.getCatogory());
-	    	  }
-	    	  
-	    	  
-	    	  ArrayList<String> LbTypeNewValue = CheckValid(Type,ArrayOfType.toString().replace("[","").replace("]", ""));
-	    	  ArrayList<String> LbClassOrGrade = CheckValid(ClassOrGrade,ArrayOfClassGrade.toString().replace("[","").replace("]", ""));
-	    	  ArrayList<String> LbCatogory = CheckValid(Catogory,ArrayOfCatogory.toString().replace("[","").replace("]", ""));
-	    	  
-	    	  if(LbTypeNewValue.size()==0 && LbClassOrGrade.size()==0 && LbCatogory.size()==0)
-		    	 {
-		    		    Mappings mapp = null;			    	    
-		    					    		   
-		    			 int val = mappingsDao.getMaxId();  	
-		    			    	mapp = new Mappings(val+1,InventoryName, Material, "Null","Null", "Null");
-		    			    	mappingsDao.updateMapping(mapp);
-		    			    				    	  
-		    	 }
-	    	  else if(LbTypeNewValue.size()>0 && LbClassOrGrade.size()==0 && LbCatogory.size()==0)
-	    	 {
-	    		    Mappings mapp = null;			    	    
-	    			for(String NewValue : LbTypeNewValue){
-	    			 int val = mappingsDao.getMaxId();  	
-	    			    	mapp = new Mappings(val+1,InventoryName, Material, NewValue,"Null", "Null");
-	    			    	mappingsDao.updateMapping(mapp);
-	    			}
-	    				    	  
-	    	 }
-	    	 
-	    	 else if(LbTypeNewValue.size()==0 && LbClassOrGrade.size()>0 && LbCatogory.size()==0)
-	    	 {
-	    		    Mappings mapp = null;			    	    
-	    			for(String NewValue : LbClassOrGrade){
-	    			 int val = mappingsDao.getMaxId();  	
-	    			    	mapp = new Mappings(val+1,InventoryName, Material, "Null",NewValue, "Null");
-	    			    	mappingsDao.updateMapping(mapp);
-	    			}
-	    				    	  
-	    	 }
-	    	  
-	    	 else if(LbTypeNewValue.size()==0 && LbClassOrGrade.size()==0 && LbCatogory.size()>0)
-	    	 {
-	    		    Mappings mapp = null;			    	    
-	    			for(String NewValue : LbCatogory){
-	    			 int val = mappingsDao.getMaxId();  	
-	    			    	mapp = new Mappings(val+1,InventoryName, Material, "Null","Null", NewValue);
-	    			    	mappingsDao.updateMapping(mapp);
-	    			}
-	    				    	  
-	    	 }
-	    	  
-	    	 
-	    	 else if(LbTypeNewValue.size()>0 && LbClassOrGrade.size()>0 && LbCatogory.size()==0)
-	    	 {
-	    		  	    		    
-	    			if(LbTypeNewValue.size()>LbClassOrGrade.size() ||LbTypeNewValue.size()==LbClassOrGrade.size())
-	    		    {
-	    		    	for(String NewType : LbTypeNewValue){
-	    		    		Mappings objTempMapping = new Mappings();
-	    		    		for(String NewClass : LbClassOrGrade)
-	    		    		{	    		    			    		    		
-	    		    		objTempMapping.setId(mappingsDao.getMaxId()+1);
-	    		    		objTempMapping.setInventoryName(InventoryName);
-	    		    		objTempMapping.setMaterial(Material);
-	    		    		objTempMapping.setType(NewType);
-	    		    		objTempMapping.setClassOrGrade(NewClass);
-	    		    		objTempMapping.setCatogory("Null");
-	    		    		mappingsDao.updateMapping(objTempMapping);
-	    		    	    objTempMapping = new Mappings();
-	    		    		}
-	    		    		
-	    		    	}
-	    		    }
-	    		    else if(LbClassOrGrade.size()>LbTypeNewValue.size())
-	    		    {
-	    		    	for(String NewClass  : LbClassOrGrade ){
-	    		    		Mappings objTempMapping = new Mappings();
-	    		    		for(String NewType  : LbTypeNewValue)
-	    		    		{	    		    			    		    		
-	    		    		objTempMapping.setId(mappingsDao.getMaxId()+1);
-	    		    		objTempMapping.setInventoryName(InventoryName);
-	    		    		objTempMapping.setMaterial(Material);
-	    		    		objTempMapping.setType(NewType);
-	    		    		objTempMapping.setClassOrGrade(NewClass);
-	    		    		objTempMapping.setCatogory("Null");
-	    		    		mappingsDao.updateMapping(objTempMapping);
-	    		    	    objTempMapping = new Mappings();
-	    		    		}
-	    		    		
-	    		    	}
-	    		    }	    	  
-	    	 }
-	    	 
-	    	 else if(LbTypeNewValue.size()==0 && LbClassOrGrade.size()>0 && LbCatogory.size()>0)
-	    	 {
-	    		 
-	    		    if(LbClassOrGrade.size()>LbCatogory.size() ||LbClassOrGrade.size()==LbCatogory.size())
-	    		    {
-	    		    	for(String NewClass : LbClassOrGrade){
-	    		    		Mappings objTempMapping = new Mappings();
-	    		    		for(String NewCatogory : LbCatogory)
-	    		    		{	    		    			    		    		
-	    		    		objTempMapping.setId(mappingsDao.getMaxId()+1);
-	    		    		objTempMapping.setInventoryName(InventoryName);
-	    		    		objTempMapping.setMaterial(Material);
-	    		    		objTempMapping.setType("Null");
-	    		    		objTempMapping.setClassOrGrade(NewClass);
-	    		    		objTempMapping.setCatogory(NewCatogory);
-	    		    		mappingsDao.updateMapping(objTempMapping);
-	    		    	    objTempMapping = new Mappings();
-	    		    		}
-	    		    		
-	    		    	}
-	    		    }
-	    		    else if(LbCatogory.size()>LbClassOrGrade.size())
-	    		    {
-	    		    	for(String NewCatogory  : LbCatogory ){
-	    		    		Mappings objTempMapping = new Mappings();
-	    		    		for(String NewClass  : LbClassOrGrade)
-	    		    		{	    		    			    		    		
-	    		    		objTempMapping.setId(mappingsDao.getMaxId()+1);
-	    		    		objTempMapping.setInventoryName(InventoryName);
-	    		    		objTempMapping.setMaterial(Material);
-	    		    		objTempMapping.setType("Null");
-	    		    		objTempMapping.setClassOrGrade(NewClass);
-	    		    		objTempMapping.setCatogory(NewCatogory);
-	    		    		mappingsDao.updateMapping(objTempMapping);
-	    		    	    objTempMapping = new Mappings();
-	    		    		}
-	    		    		
-	    		    	}
-	    		    }	    	  
-	    	 }
-	    	 
-	    	 else if(LbTypeNewValue.size()>0 && LbClassOrGrade.size()==0 && LbCatogory.size()>0)
-	    	 {
-	    		  
-	    		    if(LbTypeNewValue.size()>LbCatogory.size() ||LbTypeNewValue.size()==LbCatogory.size())
-	    		    {
-	    		    	for(String NewType : LbTypeNewValue){
-	    		    		Mappings objTempMapping = new Mappings();
-	    		    		for(String NewCatogory : LbCatogory)
-	    		    		{	    		    			    		    		
-	    		    		objTempMapping.setId(mappingsDao.getMaxId()+1);
-	    		    		objTempMapping.setInventoryName(InventoryName);
-	    		    		objTempMapping.setMaterial(Material);
-	    		    		objTempMapping.setType(NewType);
-	    		    		objTempMapping.setClassOrGrade("Null");
-	    		    		objTempMapping.setCatogory(NewCatogory);
-	    		    		mappingsDao.updateMapping(objTempMapping);
-	    		    	    objTempMapping = new Mappings();
-	    		    		}
-	    		    		
-	    		    	}
-	    		    }
-	    		    else if(LbCatogory.size()>LbTypeNewValue.size())
-	    		    {
-	    		    	for(String NewCatogory  : LbCatogory ){
-	    		    		Mappings objTempMapping = new Mappings();
-	    		    		for(String NewType  : LbTypeNewValue)
-	    		    		{	    		    			    		    		
-	    		    		objTempMapping.setId(mappingsDao.getMaxId()+1);
-	    		    		objTempMapping.setInventoryName(InventoryName);
-	    		    		objTempMapping.setMaterial(Material);
-	    		    		objTempMapping.setType(NewType);
-	    		    		objTempMapping.setClassOrGrade("Null");
-	    		    		objTempMapping.setCatogory(NewCatogory);
-	    		    		mappingsDao.updateMapping(objTempMapping);
-	    		    	    objTempMapping = new Mappings();
-	    		    		}
-	    		    		
-	    		    	}
-	    		    }	    	  
-	    	 }
-	    	 
-	    	else if(LbTypeNewValue.size()>0 && LbClassOrGrade.size()>0 && LbCatogory.size()>0)
-	    	 {
-	    		
-	    		for(String NewValue : LbTypeNewValue){
-	    			 int val = mappingsDao.getMaxId();  	
-	    			    	mappingsDao.updateMapping(new Mappings(val+1,InventoryName, Material, NewValue,"Null", "Null"));
-	    			}
-	    		for(String NewValue : LbClassOrGrade){
-	    			 int val = mappingsDao.getMaxId();  	
-	    			    	mappingsDao.updateMapping(new Mappings(val+1,InventoryName, Material, "Null",NewValue, "Null"));
-	    			}
-	    		for(String NewValue : LbCatogory){
-	    			 int val = mappingsDao.getMaxId();  	
-	    			    	mappingsDao.updateMapping(new Mappings(val+1,InventoryName, Material, "Null","Null", NewValue));
-	    			}
-	    		
-	    	 }
-	    	
-	      }
-		return decodedJson; 
-	  	
-	}
-	
-	
+//	@PostMapping("/updateMappingDetails")
+//	public @ResponseBody String updateMappingDetails(@RequestBody String dataArrayToSend) throws UnsupportedEncodingException, JsonMappingException, JsonProcessingException{
+//
+//
+//		String decodedJson = java.net.URLDecoder.decode(dataArrayToSend, "UTF-8");
+//	      ObjectMapper jacksonObjectMapper = new ObjectMapper(); // This is Jackson
+//	      List<ProductDetailsModel> userRolesGUIBeans =  jacksonObjectMapper.readValue(decodedJson, new TypeReference<List<ProductDetailsModel>>(){});
+//
+//
+//	      for(ProductDetailsModel productDetails:userRolesGUIBeans)
+//	      {
+//	    	  ArrayList<String> ArrayOfMaterialSpec = new ArrayList<String>() ;
+//	    	  ArrayList<String> ArrayOfClassOrSch = new ArrayList<String>();
+//	    	  ArrayList<String> ArrayOfStandardType = new ArrayList<String>();
+//
+//	    	  String product = productDetails.getProduct();
+//	    	  String moc = productDetails.getMaterialOfConstruct();
+//	    	  String ct = productDetails.getConstructType();
+//	    	  String classOrSch = productDetails.getClassOrSch();
+//	    	  String ms = productDetails.getMaterialSpec();
+//			  String standardType =  productDetails.getStandardType();
+//
+//	    	  ArrayList<ProductDefinition> listOfProductDetails = productDefinitionDao.getProductDetails(product, moc,ct);
+//
+//
+//	    	  for(ProductDefinition MappData:listOfProductDetails)
+//
+//	    	  {
+//	    		  ArrayOfMaterialSpec.add(MappData.getMaterialSpecs());
+//	    		  ArrayOfClassOrSch.add(MappData.getClassOrSch());
+//	    		  ArrayOfStandardType.add(MappData.getStandardType());
+//	    	  }
+//
+//
+//	    	  ArrayList<String> LbmsNewValue = CheckValid(ms,ArrayOfMaterialSpec.toString().replace("[","").replace("]", ""));
+//	    	  ArrayList<String> LbClassOrSch = CheckValid(classOrSch,ArrayOfClassOrSch.toString().replace("[","").replace("]", ""));
+//	    	  ArrayList<String> LbStandardType = CheckValid(standardType,ArrayOfStandardType.toString().replace("[","").replace("]", ""));
+//
+//	    	  if(LbmsNewValue.size()==0 && LbClassOrSch.size()==0 && LbStandardType.size()==0)
+//		    	 {
+//					 ProductDefinition productDefinition = null;
+//
+//		    			 int val = productDefinitionDao.getMaxId();
+//					 productDefinition = new ProductDefinition(product, moc, ct, "Null","Null", "Null");
+//					 productDefinitionDao.saveProductDefinition(productDefinition);
+//
+//		    	 }
+//	    	  else if(LbmsNewValue.size()>0 && LbClassOrSch.size()==0 && LbStandardType.size()==0)
+//	    	 {
+//				 ProductDefinition productDefinition = null;
+//	    			for(String NewValue : LbmsNewValue){
+//						int val = productDefinitionDao.getMaxId();
+//						productDefinition = new ProductDefinition(product, moc, ct, NewValue,"Null", "Null");
+//						productDefinitionDao.saveProductDefinition(productDefinition);
+//	    			}
+//
+//	    	 }
+//
+//	    	 else if(LbmsNewValue.size()==0 && LbClassOrSch.size()>0 && LbStandardType.size()==0)
+//	    	 {
+//				 ProductDefinition productDefinition = null;
+//	    			for(String NewValue : LbClassOrSch){
+//						int val = productDefinitionDao.getMaxId();
+//						productDefinition = new ProductDefinition(product, moc, ct,"Null",NewValue, "Null");
+//						productDefinitionDao.saveProductDefinition(productDefinition);
+//	    			}
+//
+//	    	 }
+//
+//	    	 else if(LbmsNewValue.size()==0 && LbClassOrSch.size()==0 && LbStandardType.size()>0)
+//	    	 {
+//				 ProductDefinition productDefinition = null;
+//	    			for(String NewValue : LbStandardType){
+//						int val = productDefinitionDao.getMaxId();
+//						productDefinition = new ProductDefinition(product, moc, ct,"Null","Null", NewValue);
+//						productDefinitionDao.saveProductDefinition(productDefinition);
+//	    			}
+//
+//	    	 }
+//
+//
+//	    	 else if(LbmsNewValue.size()>0 && LbClassOrSch.size()>0 && LbStandardType.size()==0)
+//	    	 {
+//
+//	    			if(LbmsNewValue.size()>LbClassOrSch.size() ||LbmsNewValue.size()==LbClassOrSch.size())
+//	    		    {
+//	    		    	for(String NewType : LbmsNewValue){
+//							ProductDefinition productDefinition = new ProductDefinition();
+//	    		    		for(String NewClass : LbClassOrSch)
+//	    		    		{
+//
+//								productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
+//								productDefinition.setMaterialSpecs(NewType);
+//								productDefinition.setClassOrSch(NewClass);
+//								productDefinition.setStandardType("Null");
+//								productDefinitionDao.saveProductDefinition(productDefinition);
+//								productDefinition = new ProductDefinition();
+//	    		    		}
+//
+//	    		    	}
+//	    		    }
+//	    		    else if(LbClassOrSch.size()>LbmsNewValue.size())
+//	    		    {
+//	    		    	for(String NewClass  : LbClassOrSch ){
+//							ProductDefinition productDefinition = new ProductDefinition();
+//	    		    		for(String NewType  : LbmsNewValue)
+//	    		    		{
+//
+//								productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
+//								productDefinition.setMaterialSpecs(NewType);
+//								productDefinition.setClassOrSch(NewClass);
+//								productDefinition.setStandardType("Null");
+//								productDefinitionDao.saveProductDefinition(productDefinition);
+//								productDefinition = new ProductDefinition();
+//	    		    		}
+//
+//	    		    	}
+//	    		    }
+//	    	 }
+//
+//	    	 else if(LbmsNewValue.size()==0 && LbClassOrSch.size()>0 && LbStandardType.size()>0)
+//	    	 {
+//
+//	    		    if(LbClassOrSch.size()>LbStandardType.size() ||LbClassOrSch.size()==LbStandardType.size())
+//	    		    {
+//	    		    	for(String NewClass : LbClassOrSch){
+//							ProductDefinition productDefinition = new ProductDefinition();
+//	    		    		for(String NewCatogory : LbStandardType)
+//	    		    		{
+//								productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
+//								productDefinition.setMaterialSpecs("Null");
+//								productDefinition.setClassOrSch(NewClass);
+//								productDefinition.setStandardType(NewCatogory);
+//								productDefinitionDao.saveProductDefinition(productDefinition);
+//								productDefinition = new ProductDefinition();
+//	    		    		}
+//
+//	    		    	}
+//	    		    }
+//	    		    else if(LbStandardType.size()>LbClassOrSch.size())
+//	    		    {
+//	    		    	for(String NewCatogory  : LbStandardType ){
+//							ProductDefinition productDefinition = new ProductDefinition();
+//	    		    		for(String NewClass  : LbClassOrSch)
+//	    		    		{
+//								productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
+//								productDefinition.setMaterialSpecs("Null");
+//								productDefinition.setClassOrSch(NewClass);
+//								productDefinition.setStandardType(NewCatogory);
+//								productDefinitionDao.saveProductDefinition(productDefinition);
+//								productDefinition = new ProductDefinition();
+//	    		    		}
+//
+//	    		    	}
+//	    		    }
+//	    	 }
+//
+//	    	 else if(LbmsNewValue.size()>0 && LbClassOrSch.size()==0 && LbStandardType.size()>0)
+//	    	 {
+//
+//	    		    if(LbmsNewValue.size()>LbStandardType.size() ||LbmsNewValue.size()==LbStandardType.size())
+//	    		    {
+//	    		    	for(String NewType : LbmsNewValue){
+//							ProductDefinition productDefinition = new ProductDefinition();
+//	    		    		for(String NewCatogory : LbStandardType)
+//	    		    		{
+//								productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
+//								productDefinition.setMaterialSpecs(NewType);
+//								productDefinition.setClassOrSch("Null");
+//								productDefinition.setStandardType(NewCatogory);
+//								productDefinitionDao.saveProductDefinition(productDefinition);
+//								productDefinition = new ProductDefinition();
+//	    		    		}
+//
+//	    		    	}
+//	    		    }
+//	    		    else if(LbStandardType.size()>LbmsNewValue.size())
+//	    		    {
+//	    		    	for(String NewCatogory  : LbStandardType ){
+//							ProductDefinition productDefinition = new ProductDefinition();
+//	    		    		for(String NewType  : LbmsNewValue)
+//	    		    		{
+//								productDefinition.setProductId(new ProductId(productDetails.getProduct(), productDetails.getMaterialOfConstruct(), productDetails.getConstructType()));
+//								productDefinition.setMaterialSpecs(NewType);
+//								productDefinition.setClassOrSch("Null");
+//								productDefinition.setStandardType(NewCatogory);
+//								productDefinitionDao.saveProductDefinition(productDefinition);
+//								productDefinition = new ProductDefinition();
+//	    		    		}
+//
+//	    		    	}
+//	    		    }
+//	    	 }
+//
+//	    	else if(LbmsNewValue.size()>0 && LbClassOrSch.size()>0 && LbStandardType.size()>0)
+//	    	 {
+//
+//	    		for(String NewValue : LbmsNewValue){
+//					int val = productDefinitionDao.getMaxId();
+//					productDefinitionDao.saveProductDefinition(new ProductDefinition(product,moc, ct, NewValue,"Null", "Null"));
+//	    			}
+//	    		for(String NewValue : LbClassOrSch){
+//					int val = productDefinitionDao.getMaxId();
+//					productDefinitionDao.saveProductDefinition(new ProductDefinition(product,moc, ct, "Null",NewValue, "Null"));
+//	    			}
+//	    		for(String NewValue : LbStandardType){
+//					int val = productDefinitionDao.getMaxId();
+//					productDefinitionDao.saveProductDefinition(new ProductDefinition(product,moc, ct, "Null","Null", NewValue));
+//	    			}
+//
+//	    	 }
+//
+//	      }
+//		return decodedJson;
+//
+//	}
+
+
 /*	private ArrayList<String> CompareHigherSizeOfList(int PiSize, ArrayList<String> ListOfType,ArrayList<String> ListOfClass, ArrayList<String> ListOfCatogory)
 	{
 		ArrayList<String> HigherList = new ArrayList<String>();

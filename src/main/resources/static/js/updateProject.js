@@ -387,9 +387,6 @@
    })();
  });
 
-
-
-
   function download(name, sectionName) 
   {
 
@@ -439,9 +436,19 @@
         var val = headerHTML[k].value;
 
         $('[name="'+ele.name+'"]').attr('value',val);
-      }
+        
+       }
 
       var sheetDetailsHTML = headerHTML[headerHTML.length-1];
+      try
+      {
+      	$('[name="sheetDetails"]').remove();
+      }
+      catch(err)
+      {
+    	  console.log(err);
+      }
+      
       $('[name="generateBOQ"]').append(sheetDetailsHTML);
 
       $('#sheetList'+sectionName).html('');
@@ -650,13 +657,14 @@ function cleanArray(actual)
         + "    <td><input class='form-control' style='width:60px;' type='text' name='supplyAmount' value=''></input></td>"
         + "    <td><input class='form-control' style='width:60px;' type='text' name='erectionAmount' value=''></input></td>";
 
-    console.log(template);
+  
     $('.inventoryDetails').css("display","block");            
 
     var sheet = $($('.nav-link.active.show')[1]).attr('href').substring(1);
 
     if($('#'+sheet).find('tbody#tableContentDetails.inventry').length>0)
     {
+
         $('#'+sheet).find('tbody#tableContentDetails.inventry').last().after(template);
     }
     else if($('#'+sheet).find('tbody#tableContentDetails.accessoryTr').length>0)
@@ -666,6 +674,7 @@ function cleanArray(actual)
     else
     {
      $('#'+sheet).find('tbody#tableContentDetails').append(template);
+
     }
  }
 
@@ -1061,27 +1070,33 @@ function cleanArray(actual)
   $(function() {
     $('button[name=generateBOQButton]').click(function(e) {
       e.preventDefault();
-
+console.log($('[name="sheetDetails"]').length);
+console.log($('[name="sheetDetails"]'));
       if($('[name="sheetDetails"]').length===0)
       {
         alert('Please add atleast 1 sheet with Inventory Details and try again..!!');
         return;
       }
-
+      
+      var checkedRows = $('#tableContentDetails').find('input:checkbox:checked').parent().parent();
+      
       var ele1 = $('[name="quantity"]');
       var length = $('#tableContentDetails').find(ele1).length;
       var stopNow = false;
 
       var sheetCount = $('[name="sheetDetails"]');
-      
+
       try
       {
+    	  var sheetDetailsStr = "";
+    	  
         for(var i=0;i<sheetCount.length;i++)
         {
           var eleLength = 0;
+          var sheetNameVal = sheetCount[i].value.split(',')[0];
+          
 
-
-          eleLength = $('#'+sheetCount[i].value).find('tbody#tableContentDetails').find('input[name="product"]').length;
+          eleLength = $('#'+sheetNameVal).find('tbody#tableContentDetails').find('input[name="product"]').length;
 
           if(eleLength===0)
           {
@@ -1089,13 +1104,17 @@ function cleanArray(actual)
             return;
           }
 
-          $('#'+sheetCount[i].value).find('tbody#tableContentDetails').find('input[name="sheetDetails"]').attr('value',sheetCount[i].value.split(',')[0]+','+eleLength);
+          //$('#'+sheetNameVal).find('tbody#tableContentDetails').find('input[name="sheetDetails"]').attr('value',sheetCount[i].value.split(',')[0]+','+eleLength);
+          sheetDetailsStr = sheetDetailsStr + sheetCount[i].value.split(',')[0]+','+eleLength + ',';
+         
         }
       }
       catch(e)
       {
-        console.log(e);
+        console.log(e.message);
       }
+      
+      $('[name="sheetDetails"]').attr('value',sheetDetailsStr);
 
       for(var i=0; i < length; i++)
       {
@@ -1207,13 +1226,13 @@ function cleanArray(actual)
     }
     else if(docType==='boq')
     {
-      if($('#boqName')[0].value==='')
+      if($('.revisionSection').val()==='')
       {
         alert('Please select the BOQ to delete');
         return;
       }
 
-      fileToDownloadName = $('#boqName')[0].value;
+      fileToDownloadName = $('.revisionSection').val();
     }
 
     var newForm = jQuery('<form>', {
@@ -1230,6 +1249,16 @@ function cleanArray(actual)
     }));
     $(document.body).append(newForm);
     newForm.submit();
+  }
+  
+  function deleteItem(){
+	  
+	  var checkedRows = $('#tableContentDetails').find('input:checkbox:checked').parent().parent();
+	  
+	  for(var i=0; i< checkedRows.length; i++){
+		  $('#tableContentDetails').find('input:checkbox:checked').parent().parent().remove();
+	  }
+	  
   }
 
   function generateInvoice() 
@@ -1350,25 +1379,38 @@ function cleanArray(actual)
       return;
     }
     var sheetName = $('[name="newSheetName"]').val();
-    var tab = '<li class="nav-item"><a class="nav-link '+sheetName+'" href="#'+sheetName+'" role="tab" data-toggle="tab" aria-selected="true">'+sheetName+'<i class="fa fa-times pr-2" onClick="removeSheet('+sheetName+');" style="margin-left:5px;"></i></a></li>';
-
-    $('#sheetListtableContentDetails').append(tab);
     
-    var tabPane = '<div class="tab-pane fade" id="'+sheetName+'" role="tabpanel">'
-			+'<div class="row" style="margin-top:2%;">     <div class="col-md-12 ">'
-			+'<div class="table-responsive">'
-			+'<table class="table table-colored inventoryDetails inventoryTableHeader" style="display: none;">'
-			+'<thead>           <tr>'
-			+'<th>#</th><th>Product</th><th>MOC</th><th>Manif Type</th><th>Grd/Cls</th><th>Material Specs</th><th>Standard Type</th><th>Ends</th><th>Size</th><th>Qty</th><th>Base Supply Rate</th><th>Supply Rate</th><th>Base Erection Rate</th><th>Erection Rate</th><th>Supply Amount</th><th>Erection Amount</th></tr>'
-			+'<tr>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th><input type="text" style="width:45px;" name="supplyPrsnt" onChange="updateSupplyRate($(this));"/></th>            <th></th>            <th><input type="text" style="width:45px;" name="erectionPrsnt" onChange="updateErectionRate($(this));"/></th>            <th></th>            <th></th>            <th></th><th></th>          </tr>'
-			+'</thead>        <tbody id="tableContentDetails">        </tbody>      </table>    </div>  </div></div><div class="separator clearfix"></div><p class="text-right"><strong>SubTotal :</strong> <span id="'+sheetName+'SupSubTotal">0.00</span> <span id="'+sheetName+'EreSubTotal">0.00</span></p></div>';
+  
+    var listOfNames = $('#sheetListtableContentDetails li a');
 
-    $($('.tab-content')[1]).append(tabPane); 
+    for(var i=0; i<listOfNames.length; i++)
+    {
+        if(listOfNames[i].text === sheetName)
+        {
+          alert("Sheet already present. Please try with another name.");
+          return;
+        }
+        
+    }
+        	    var tab = '<li class="nav-item"><a class="nav-link '+sheetName+'" href="#'+sheetName+'" role="tab" data-toggle="tab" aria-selected="true">'+sheetName+'<i class="fa fa-times pr-2" onClick="removeSheet('+sheetName+');" style="margin-left:5px;"></i></a></li>';
 
-    $('#'+sheetName).find('tbody#tableContentDetails').append('<input type="hidden" name="sheetDetails" id="sd'+sheetName+'" value="'+sheetName+'">');
+        	    $('#sheetListtableContentDetails').append(tab);
+        	    
+        	    var tabPane = '<div class="tab-pane fade" id="'+sheetName+'" role="tabpanel">'
+        				+'<div class="row" style="margin-top:2%;">     <div class="col-md-12 ">'
+        				+'<div class="table-responsive">'
+        				+'<table class="table table-colored inventoryDetails inventoryTableHeader" style="display: none;">'
+        				+'<thead>           <tr>'
+        				+'<th>#</th><th>Product</th><th>MOC</th><th>Manif Type</th><th>Grd/Cls</th><th>Material Specs</th><th>Standard Type</th><th>Ends</th><th>Size</th><th>Qty</th><th>Base Supply Rate</th><th>Supply Rate</th><th>Base Erection Rate</th><th>Erection Rate</th><th>Supply Amount</th><th>Erection Amount</th></tr>'
+        				+'<tr>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>            <th></th>   <th></th>         <th><input type="text" style="width:45px;" name="supplyPrsnt" onChange="updateSupplyRate($(this));"/></th>            <th></th>            <th><input type="text" style="width:45px;" name="erectionPrsnt" onChange="updateErectionRate($(this));"/></th>            <th></th>            <th></th>            <th></th>          </tr>'
+        				+'</thead>        <tbody id="tableContentDetails">        </tbody>      </table>    </div>  </div></div><div class="separator clearfix"></div><p class="text-right"><strong>SubTotal :</strong> <span id="'+sheetName+'SupSubTotal">0.00</span> <span id="'+sheetName+'EreSubTotal">0.00</span></p></div>';
+
+        	    $($('.tab-content')[1]).append(tabPane); 
+
+        	    $('#'+sheetName).find('tbody#tableContentDetails').append('<input type="hidden" name="sheetDetails" id="sd'+sheetName+'" value="'+sheetName+'">');
 
 
-    $('.nav-link '+sheetName).trigger('click');
+        	    $('.nav-link '+sheetName).trigger('click');
 
   }
 

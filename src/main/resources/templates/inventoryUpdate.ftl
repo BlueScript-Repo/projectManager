@@ -156,7 +156,7 @@
                             </div>
                             <div class="form-group col-md-3">
                                 <label>From</label>
-                                <input type="text" class="form-control" name="receivedFrom" value="PECO Projects">
+                                <input type="text" class="form-control" name="receivedFrom" value="Humdule Industry">
                             </div>
                             <div class="form-group col-md-3">
                                 <label>Consignee</label>

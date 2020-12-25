@@ -1,6 +1,7 @@
 package com.projectmanager.dao;
 
 import com.projectmanager.entity.ProductDefinition;
+import com.projectmanager.model.ProductDetailsModel;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -112,5 +113,43 @@ public class ProductDefinitionDao
         }
         return associatedValues;
     }
+    @Transactional
+    public ArrayList<ProductDefinition> getProductDetails(String product, String materialOfConstruction, String manufactureMethod) {
+       // ArrayList<ProductDefinition> productList = new ArrayList<>();
+        Session session = sessionFactory.getCurrentSession();
+        String sql ="from ProductDefinition where product =: product and materialOfConstruction=: materialOfConstruction and manufactureMethod=:manufactureMethod";
+        Query query = session.createQuery(sql);
+        query.setParameter("product", product);
+        query.setParameter("materialOfConstruction",materialOfConstruction);
+        query.setParameter("manufactureMethod", manufactureMethod);
+        List productList = query.getResultList();
+        return (ArrayList<ProductDefinition>) productList;
+    }
+    @org.springframework.transaction.annotation.Transactional
+    public int getMaxId ()
+    {
+        Session session = sessionFactory.getCurrentSession();
+        String selectHql = "SELECT MAX(id) AS id From ProductDefinition";
+        Query query = session.createQuery(selectHql);
 
+        Object obj = query.getSingleResult();
+        if(obj==null) return 0;
+        return (Integer)obj;
+    }
+
+
+    @Transactional
+    public void updateProductDefination(String product, String materialOfConstruction, String manufactureMethod, String materialSpecs, String classOrSch, String standardType) {
+        Session session = sessionFactory.getCurrentSession();
+        String sql ="update ProductDefinition set materialSpecs =:materialSpecs , classOrSch =:classOrSch , standardType =:standardType where product =: product and materialOfConstruction=: materialOfConstruction and manufactureMethod=:manufactureMethod";
+        Query query = session.createQuery(sql);
+        query.setParameter("product", product);
+        query.setParameter("materialOfConstruction",materialOfConstruction);
+        query.setParameter("manufactureMethod", manufactureMethod);
+        query.setParameter("materialSpecs",materialSpecs);
+        query.setParameter("classOrSch",classOrSch);
+        query.setParameter("standardType",standardType);
+
+        query.executeUpdate();
+    }
 }

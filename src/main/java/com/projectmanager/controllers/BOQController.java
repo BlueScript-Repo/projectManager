@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -23,12 +28,37 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.projectmanager.dao.*;
-import com.projectmanager.entity.*;
+import com.projectmanager.dao.AccessoryDetailsDao;
+import com.projectmanager.dao.BOQDetailsDao;
+import com.projectmanager.dao.BOQHeaderDao;
+import com.projectmanager.dao.BOQLineDataDao;
+import com.projectmanager.dao.DesignOfferDao;
+import com.projectmanager.dao.InventoryDao;
+import com.projectmanager.dao.InventoryDefinitionDao;
+import com.projectmanager.dao.MappingsDao;
+import com.projectmanager.dao.ProductDefinitionDao;
+import com.projectmanager.dao.ProjectDao;
+import com.projectmanager.dao.UserDetailsDao;
+import com.projectmanager.dao.ValvesDao;
+import com.projectmanager.dao.VendorDetailsDao;
+import com.projectmanager.entity.AccessoryDetails;
+import com.projectmanager.entity.BOQDetails;
+import com.projectmanager.entity.BOQHeader;
+import com.projectmanager.entity.BOQLineData;
+import com.projectmanager.entity.Inventory;
+import com.projectmanager.entity.InventorySpec;
+import com.projectmanager.entity.Project;
+import com.projectmanager.entity.Valves;
+import com.projectmanager.entity.VendorDetails;
 import com.projectmanager.excel.ExcelReader;
 import com.projectmanager.excel.ExcelWriter;
 import com.projectmanager.interfaces.BOQData;
-import com.projectmanager.util.*;
+import com.projectmanager.util.ConfigProperties;
+import com.projectmanager.util.EmailUtils;
+import com.projectmanager.util.HTMLElements;
+import com.projectmanager.util.InventoryUtils;
+import com.projectmanager.util.MappingsUtil;
+import com.projectmanager.util.NotificationUtil;
 
 @Controller
 @EnableWebMvc
@@ -493,7 +523,7 @@ public class BOQController {
             out.close();
             fout.close();
 
-            notificationUtil.pushNotification(userName, vendorDetails.getContactEmail(), "PECO Projects : Inventory Inquiry", "Greeting of thr day from PECO Projects. Please find attached the Inventory requirment. PLeaase update the same and respond.", file.getName(), "INBOX", new Date());
+            notificationUtil.pushNotification(userName, vendorDetails.getContactEmail(), "Hamdule Projects : Inventory Inquiry", "Greeting of the day from Hamdule Industry. Please find attached the Inventory requirment. Please update the same and respond.", file.getName(), "INBOX", new Date());
 
         } else {
             response.setHeader("Content-disposition", "attachment; filename=" + boqNameRevisionStr + ".xls");
@@ -509,114 +539,7 @@ public class BOQController {
         }
     }
 
-    @RequestMapping(value = "generateDesign", method = RequestMethod.POST)
-    public @ResponseBody void generateDesignOffer(HttpServletResponse response, String docNumber, String contactName, String clientCompany, String address, String city, String pinCode, String subject, String utility, String lineItemMainDesc, String[] scope, String[] deliverables, String[] delivery, String[] payTerm, String[] lineItemDesc, String[] lineItemQty, String[] lineItemRate, String[] termsAndCondition, String projectId) {
-
-        StringBuilder scopeStr = new StringBuilder();
-        StringBuilder deliverablesStr = new StringBuilder();
-        StringBuilder deliveryStr = new StringBuilder();
-        StringBuilder payTermStr = new StringBuilder();
-        StringBuilder lineItemDescStr = new StringBuilder();
-        StringBuilder lineItemQtyStr = new StringBuilder();
-        StringBuilder lineItemRateStr = new StringBuilder();
-        StringBuilder termsAndConditionStr = new StringBuilder();
-
-        for (String value : scope) {
-            scopeStr.append(value + "&*&*");
-        }
-
-        for (String value : deliverables) {
-            deliverablesStr.append(value + "&*&*");
-        }
-
-        for (String value : delivery) {
-            deliveryStr.append(value + "&*&*");
-        }
-
-        for (String value : payTerm) {
-            payTermStr.append(value + "&*&*");
-        }
-
-        for (String value : lineItemDesc) {
-            lineItemDescStr.append(value + "&*&*");
-        }
-
-        for (String value : lineItemQty) {
-            lineItemQtyStr.append(value + "&*&*");
-        }
-
-        for (String value : lineItemRate) {
-            lineItemRateStr.append(value + "&*&*");
-        }
-
-        for (String value : termsAndCondition) {
-            termsAndConditionStr.append(value + "&*&*");
-        }
-
-        ArrayList<String> designOfferVersions = designOfferDao.getLatestAssociatedDocNo(docNumber);
-
-        String version = "_R0";
-
-        if (designOfferVersions.size() > 0) {
-            Collections.sort(designOfferVersions);
-
-            version = designOfferVersions.get(designOfferVersions.size() - 1);
-
-            version = version.substring(version.length() - 3);
-
-            version = version.substring(0,2) + String.valueOf(Integer.valueOf(version.substring(2))+1);
-        }
-
-        docNumber = docNumber + version;
-
-        DesignOffer designOffer = new DesignOffer(docNumber, contactName, clientCompany, address, city, pinCode, subject, utility, lineItemMainDesc, scopeStr.toString(), deliverablesStr.toString(), deliveryStr.toString(), payTermStr.toString(), lineItemDescStr.toString(), lineItemQtyStr.toString(), lineItemRateStr.toString(), termsAndConditionStr.toString(), new Date(), projectId);
-
-        byte[] designOfferBytes = writer.createDesignOffer(designOffer);
-
-        designOfferDao.saveOrUpdateDesignOffer(designOffer);
-
-        response.setHeader("Content-disposition", "attachment; filename=" + docNumber + ".xls");
-
-        OutputStream out = null;
-        try {
-            out = response.getOutputStream();
-
-            byte[] buffer = designOfferBytes;
-            int length = buffer.length;
-
-            out.write(buffer, 0, length);
-            out.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @RequestMapping(value = "downloadDesignOffer", method = RequestMethod.POST)
-    public @ResponseBody void generateDesignOffer(HttpServletResponse response, String docNumber)
-    {
-        DesignOffer designOffer = designOfferDao.getDesignOffer(docNumber);
-
-        byte[] designOfferBytes = writer.createDesignOffer(designOffer);
-
-        response.setHeader("Content-disposition", "attachment; filename=" + docNumber + ".xls");
-
-        OutputStream out = null;
-        try {
-            out = response.getOutputStream();
-
-            byte[] buffer = designOfferBytes;
-            int length = buffer.length;
-
-            out.write(buffer, 0, length);
-            out.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    
     protected ArrayList<BOQLineData> getBOQLineDataList(ArrayList<BOQDetails> boqDetailsList)
     {
         int length = boqDetailsList.size();
@@ -727,6 +650,12 @@ public class BOQController {
         }
 
         return boqLineData;
+    }
+    @RequestMapping(value = "/getSheetName", method = RequestMethod.POST)
+    public @ResponseBody boolean getSheetName(String sheetName){
+    	//ArrayList<String> sheet = new ArrayList<>();
+    	boolean sheet = boqDetailsDao.getSheetName(sheetName);
+    	return sheet;
     }
 
     @RequestMapping(value = "/getDropdown", method = RequestMethod.POST)

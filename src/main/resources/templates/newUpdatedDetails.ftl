@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Hamdule  Project</title>
+    <title>Hamdule Project</title>
     <meta name="description" content="The Project a Bootstrap-based, Responsive HTML5 Template">
     <meta name="author" content="author">
 
@@ -319,6 +319,8 @@ style="display: none;">
 </div>
 <div class="row" style="margin-top: 2%;">
     <div class="col-md-1" align="center">
+     <input type="button" class="btn btn-default" name="deleteItemButton"
+        onclick="deleteItem('boq');" value="Delete Item">
     </div>
     <div class="col-md-2" align="center">
         <input type="button" class="btn btn-default" name="deleteBoqButton"

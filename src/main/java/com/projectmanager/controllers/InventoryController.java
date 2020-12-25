@@ -302,6 +302,37 @@ public class InventoryController {
             }
             view.addObject("projectNames", projectNames.toString());
         }
+        for(int i= 0 ; i<product.length;i++){
+       	 InventoryMuster invenMust = new InventoryMuster();
+            invenMust.setInventoryName(product[i]);
+            invenMust.setMaterial(moc[i]);
+            invenMust.setManifMethod(manufactureType[i]);
+            invenMust.setType(standardType[i]);
+            invenMust.setGradeOrClass(gradeOrClass[i]);
+            invenMust.setEnds(ends[i]);
+            invenMust.setSize(size[i]);
+            
+            if (generateChallan.equals("1")) {
+            invenMust.setConsignee(challanDetails.getConsignee());
+            invenMust.setChallanNo(challanDetails.getInventoryRowId() + " - " + "1/" + noOfChallan);
+            }
+            else {
+                invenMust.setConsignee("");
+                invenMust.setChallanNo("");
+                }
+            invenMust.setAssignedProject(project[i-i]);
+            invenMust.setQuantity(quantity[i]);
+            invenMust.setReceiveDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+            invenMust.setLocation(location[i]);
+          //  invenMust.setMaterialSpecs(materialSpecs[i]);
+            try {
+                
+                inventoryDao.saveReveivedInventory(invenMust);
+              } catch (Exception ex) {
+                  System.out.println("calling update inventory not present");
+                  ex.printStackTrace();
+              }
+        }
 
         return view;
     }
@@ -324,6 +355,7 @@ public class InventoryController {
         int lastNo = 0;
         if (lasttaxInvoiceNo.length() > 0) {
             lastNo = Integer.parseInt(lasttaxInvoiceNo.substring(lasttaxInvoiceNo.lastIndexOf("/") + 1));
+            System.out.println(lastNo);
         }
 
         String temp = projectName;
@@ -337,6 +369,7 @@ public class InventoryController {
         ProjectDetails projectDetails = projectDetailsDao.getProjectDetails(projectId);
 
         String invoiceNo = "Invoice/" + clientShortName.replaceAll(" ", "_") + "/" + String.valueOf(lastNo + 1);
+        System.out.println(invoiceNo);
         taxInvoiceDetails.setInvoiceNo(invoiceNo);
         taxInvoiceDetails.setTaxInvoiceNo(invoiceNo);
         taxInvoiceDetails.setOrderNo(projectDetails.getPoNumber());

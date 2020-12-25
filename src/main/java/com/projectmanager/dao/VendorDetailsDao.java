@@ -61,6 +61,7 @@ public class VendorDetailsDao {
 
 	try {
 	    String queryStr = "from VendorDetails vd where vd.vendorName='";
+	    vendorName = vendorName.trim();
 
 	    Query query = session.createQuery(queryStr + vendorName + "'");
 

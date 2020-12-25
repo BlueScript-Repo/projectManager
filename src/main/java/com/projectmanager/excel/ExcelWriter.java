@@ -56,7 +56,8 @@ public class ExcelWriter {
         }
 
         String sheetDetails = header.getSheetDetails();
-
+        
+        //may be want to change 
         if (null == sheetDetails || "".equals(sheetDetails)) {
             sheetDetails = "sheetDetails," + boqLineDataDetails.size();
 
@@ -65,12 +66,13 @@ public class ExcelWriter {
             // one sheet which will hold all the elements
             // elements.
         }
-
+        
         String[] sheets = sheetDetails.split(",");
 
         Map<String, String> sheetDetailsMap = new LinkedHashMap<String, String>();
 
-        for (int i = 0; i < sheets.length; i++) {
+        for (int i = 0; i < sheets.length; i++) 
+        {
             sheetDetailsMap.put(sheets[i], sheets[++i]);
         }
 

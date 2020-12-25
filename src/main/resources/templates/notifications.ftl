@@ -38,7 +38,7 @@
         <div class="mail-sidebar d-none d-lg-block col-md-2 pt-3 bg-white border">
         <div class="menu-bar">
                   <ul class="menu-items">                    
-                    <li class="font-weight-bold inboxItems" onclick="showItems('inboxItems');">Inbox</li>
+                    <li class="font-weight-bold inboxItems" onclick="showItems('inboxItems');">Outbox</li>
                     <li class="font-weight-bold sentItems" onclick="showItems('sentItems');">Sent</li>
                 </ul>
         </div>
@@ -106,7 +106,7 @@ function populateItems(notificationListCode)
 
     var mailEntry =  '<div class="mail-list border" onclick="show(\'ITEM_NO\')">              <div class="content">                   <p class="message_text">SUBJECT</p>                 </div>             </div>';
 
-    var mailBody = '<div class="message-body" id="ITEM_NO" style="display:none;">              <div class="sender-details bg-light">                <div class="details">                  <p class="msg-subject">                    <textarea name="subject" class="form-control mailSubject" rows="1" style="width:143%;"> SUBJECT </textarea>                </p> <p class="sender-email"> <span class="float-left">TO :  RECEIVER <input type="hidden" class="receiverAddr" name="receiverAddr" value="RECEIVER">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="mdi mdi-account-multiple-plus"></i></span> <span class="float-right"> DATEnTIME</span></p>           </div>        </div>        <div class="message-content"> <textarea name="body" class="form-control mailBody" rows="12">MAILBODY</textarea>                        <p><br><br>Regards,<br>SENDER</p>        </div>        <div class="attachments-sections">            <ul style="display:inline;">              <li>                  <a href="downloadAttachment?fileName=ATTACHMENT1" class="attach1">ATTACHMENT1 </a>              </li>              <li>                  <a href="downloadAttachment?fileName=ATTACHMENT2" class="attach2">ATTACHMENT2 </a>              </li>          </ul>      <input type="hidden" name="dbItemId" class="dbItemId" value="dbItemIdVal" > <input type="hidden" name="date" class="sentDate" value="DATEnTIME"><input type="button" class="btn btn-primary" onclick="sendNotify(\'ITEM_NO\')" value="Send"></div>  </div>';
+    var mailBody = '<div class="message-body" id="ITEM_NO" style="display:none;">              <div class="sender-details bg-light">                <div class="details">                  <p class="msg-subject">                    <textarea name="subject" class="form-control mailSubject" rows="1" style="width:143%;"> SUBJECT </textarea>                </p> <p class="sender-email"> <span class="float-left">TO :  RECEIVER <input type="hidden" class="receiverAddr" name="receiverAddr" value="RECEIVER">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="mdi mdi-account-multiple-plus"></i></span> <span class="float-right"> DATEnTIME</span></p>           </div>        </div>        <div class="message-content"> <textarea name="body" class="form-control mailBody" rows="12">MAILBODY</textarea>                        <p><br><br>Regards,<br>SENDER<input type="hidden"  name="userName" value="SENDER"></p>        </div>        <div class="attachments-sections">            <ul style="display:inline;">              <li>                  <a href="downloadAttachment?fileName=ATTACHMENT1" class="attach1">ATTACHMENT1 </a>              </li>              <li>                  <a href="downloadAttachment?fileName=ATTACHMENT2" class="attach2">ATTACHMENT2 </a>              </li>          </ul>      <input type="hidden" name="dbItemId" class="dbItemId" value="dbItemIdVal" > <input type="hidden" name="date" class="sentDate" value="DATEnTIME"><input type="button" class="btn btn-primary" onclick="sendNotify(\'ITEM_NO\')" value="Send"></div>  </div>';
 
     var indexNo = 0;
     $.each(notifList, function(index1, value) {
@@ -132,6 +132,10 @@ function populateItems(notificationListCode)
         if(index===0)
         {
             bodyHTML = bodyHTML.replace(/dbItemIdVal/g,value);
+        }
+        else if(index===1)
+        {
+        	bodyHTML = bodyHTML.replace(/SENDER/g,value);
         }
         else if(index===2)
         {
@@ -244,6 +248,7 @@ function populateItems(notificationListCode)
         }        
 
         var receiver = $('#'+itemNo).find('.receiverAddr')[0].value;
+        
 
         console.log('subject is : ' + subject);
         console.log('attach1 is : '+attach1);
