@@ -369,6 +369,17 @@ console.log(row);
    var table = document.getElementById(tableID);
 
    var rowCount = table.rows.length;
+        row = $('#tblValvesDetails tbody tr')
+       rowSize= row.length - 1;
+       InventoryLength = $(row[rowSize]).find("input[name=model]").val().length;
+       MaterialLength = $(row[rowSize]).find("input[name=material]").val().length;
+         if(InventoryLength == 0 && MaterialLength == 0 || InventoryLength == 0 || MaterialLength == 0 )
+             {
+              alert("Please check already blank row present");
+              return;
+
+            }
+
    var row = table.insertRow(rowCount);
 
    var cell1 = row.insertCell(0);

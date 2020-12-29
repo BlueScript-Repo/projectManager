@@ -621,7 +621,7 @@ public class InventoryController {
                                     String invoiceNo, String invoiceType, String userName) {
 
         invoiceNo = invoiceNo.replace("/", "_");
-        String destination = System.getProperty("java.io.tmpdir") + "/" + userName + "/" + invoiceNo + "_Annexure.xls";
+        String destination = System.getProperty("java.io.tmpdir") + "/" + userName + "/" + invoiceNo + "_Annexture.xls";
 
         String docNameToDownload = boqDetailsDao.getLatestAssociatedBOQProject(projectId);
 
@@ -725,6 +725,6 @@ public class InventoryController {
             return String.valueOf(erectionAmountTotal + supplyAmountTotal);
         }
 
-        return "";
+        return "true";
     }
 }

@@ -10,6 +10,7 @@ import javax.annotation.ManagedBean;
 import com.itextpdf.text.*;
 import com.projectmanager.dao.TaxesDao;
 import com.projectmanager.entity.TaxesEntity;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -38,6 +39,7 @@ public class Principal {
             InputStream inputStream = resource.getInputStream();
 
             File BankGothicRegular = new File(System.getProperty("java.io.tmpdir") + "/BankGothicRegular.ttf");
+            //FileUtils.c
             FileUtils.copyInputStreamToFile(inputStream, BankGothicRegular);
 
             FontFactory.register(BankGothicRegular.getAbsolutePath(), "Bank_Gothic");

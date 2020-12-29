@@ -32,7 +32,6 @@ import com.projectmanager.dao.AccessoryDetailsDao;
 import com.projectmanager.dao.BOQDetailsDao;
 import com.projectmanager.dao.BOQHeaderDao;
 import com.projectmanager.dao.BOQLineDataDao;
-import com.projectmanager.dao.DesignOfferDao;
 import com.projectmanager.dao.InventoryDao;
 import com.projectmanager.dao.InventoryDefinitionDao;
 import com.projectmanager.dao.MappingsDao;
@@ -121,8 +120,6 @@ public class BOQController {
     @Autowired
     NotificationUtil notificationUtil;
 
-    @Autowired
-    DesignOfferDao designOfferDao;
 
     @Autowired
     ProductDefinitionDao productDefinitionDao;

@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.annotation.ManagedBean;
 
 import com.projectmanager.entity.BOQDetails;
-import com.projectmanager.entity.DesignOffer;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -516,7 +515,17 @@ public class ExcelWriter {
                     .setCellValue(supplyAmountTotal);
             sheet.getRow(nextRow - 2).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
                     .setCellValue(erectionAmountTotal);
-
+            sheet.createRow(nextRow - 1);
+            sheet.getRow(nextRow - 1).getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue("Total");
+            sheet.getRow(nextRow - 1).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(erectionAmountTotal+supplyAmountTotal);
+            sheet.getRow(nextRow - 1).getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
+            sheet.getRow(nextRow - 1).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellStyle(whiteBackGroundBaseLineRight);
             Sheet annexture = workBook.getSheetAt(1);
 
             annexture.getRow(4 + s).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(s);
@@ -565,7 +574,7 @@ public class ExcelWriter {
         {
             workBook.removeSheetAt(0);
             workBook.removeSheetAt(1);
-        } else if (isOffer)
+        }  else if (isOffer)
         {
             workBook.removeSheetAt(0);
             workBook.removeSheetAt(0);
@@ -645,126 +654,6 @@ public class ExcelWriter {
 
     public void generatePO() {
 
-    }
-
-    public byte[] createDesignOffer(DesignOffer designOffer) {
-
-        try {
-            Workbook workBook = null;
-
-            Resource resource = new ClassPathResource("classpath:DesignOfferTemplate.xls");
-            InputStream inputStream = resource.getInputStream();
-
-            workBook = WorkbookFactory.create(inputStream);
-
-            Sheet sheet = workBook.getSheetAt(0);
-
-			//Doc number
-            sheet.getRow(2).getCell(0).setCellValue("Doc No."+designOffer.getDocNumber());
-
-            // Date
-			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yy");
-			sheet.getRow(3).getCell(7).setCellValue(df.format(designOffer.getCreationDate()));
-
-			//Name
-			sheet.getRow(4).getCell(0).setCellValue(designOffer.getContactName());
-
-			//Company
-			sheet.getRow(5).getCell(0).setCellValue(designOffer.getClientCompany());
-
-			//Address
-			sheet.getRow(6).getCell(0).setCellValue(designOffer.getAddress());
-
-			//City - PIN
-			sheet.getRow(7).getCell(0).setCellValue(designOffer.getCity()+" - "+designOffer.getPinCode());
-
-			//Subject
-			sheet.getRow(10).getCell(1).setCellValue(designOffer.getSubject());
-
-			//Main Description
-			sheet.getRow(15).getCell(1).setCellValue(designOffer.getLineItemMainDesc());
-
-			String seperater = "\\&\\*\\&\\*";
-
-			//Line Items
-			String[] lineItemDesc = designOffer.getLineItemDesc().split(seperater);
-			String[] lineItemQty = designOffer.getLineItemQty().split(seperater);
-			String[] lineItemRate = designOffer.getLineItemRate().split(seperater);
-
-			for(int i=0; i< lineItemDesc.length;i++)
-			{
-				sheet.getRow(16+i).getCell(1).setCellValue(lineItemDesc[i]);
-				sheet.getRow(16+i).getCell(5).setCellValue(lineItemQty[i]);
-				sheet.getRow(16+i).getCell(6).setCellValue(lineItemRate[i]);
-			}
-
-			//Scope
-			String[] scope = designOffer.getScope().split(seperater);
-			for(int i=0; i<scope.length; i++)
-			{
-				if(23+i>=29)
-				{
-					sheet.getRow(24+i).getCell(0).setCellValue(scope[i]);
-				}
-				else {
-					sheet.getRow(23 + i).getCell(0).setCellValue(scope[i]);
-				}
-			}
-
-			//Deliverables
-			String[] deliverables = designOffer.getDeliverables().split(seperater);
-			for(int i=0; i<deliverables.length; i++)
-			{
-				sheet.getRow(33 + i).getCell(0).setCellValue(deliverables[i]);
-			}
-
-			//Delivery
-			String[] delivery = designOffer.getDelivery().split(seperater);
-			for(int i=0; i<delivery.length; i++)
-			{
-				sheet.getRow(42 + i).getCell(1).setCellValue(delivery[i]);
-			}
-
-			//Payment Terms
-			String[] payTerms = designOffer.getPayTerm().split(seperater);
-			for(int i=0; i<payTerms.length; i++)
-			{
-				sheet.getRow(47 + i).getCell(1).setCellValue(payTerms[i]);
-			}
-
-			//General Terms
-			String[] termsAndCondition = designOffer.getTermsAndCondition().split(seperater);
-			for(int i=0; i<termsAndCondition.length; i++)
-			{
-				sheet.getRow(50 + i).getCell(1).setCellValue(termsAndCondition[i]);
-			}
-
-
-			FormulaEvaluator evaluator1 = workBook.getCreationHelper().createFormulaEvaluator();
-
-			evaluator1.evaluateFormulaCell(sheet.getRow(16).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			evaluator1.evaluateFormulaCell(sheet.getRow(17).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			evaluator1.evaluateFormulaCell(sheet.getRow(18).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			evaluator1.evaluateFormulaCell(sheet.getRow(19).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-			evaluator1.evaluateFormulaCell(sheet.getRow(20).getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-
-			inputStream.close();
-
-			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-
-			workBook.write(bOut);
-
-			bOut.close();
-			byte[] designOfferBytes = bOut.toByteArray();
-
-			workBook.close();
-
-			return designOfferBytes;
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        	return null;
-        }
     }
 
 
