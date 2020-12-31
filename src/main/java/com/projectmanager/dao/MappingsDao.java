@@ -191,8 +191,7 @@ public class MappingsDao {
 		boolean classOrGradePresent = false;
 		try{
 		Session session = sessionFactory.getCurrentSession();
-		System.out.println("ceck class or grade is present");
-		String selectHql= "FROM Mappings WHERE inventoryName=:inventoryName AND material=:material AND classOrGrade IN(:classOrGrade)";
+				String selectHql= "FROM Mappings WHERE inventoryName=:inventoryName AND material=:material AND classOrGrade IN(:classOrGrade)";
 		Query query = session.createQuery(selectHql);
 		query.setParameter("inventoryName", inventoryName);
 		query.setParameter("material", material);
