@@ -166,10 +166,22 @@
             <input type="text" class="form-control" name="vendorEmail" required>
           </div>
           <div class="form-group col-md-4">
+                       <label>Vendor Gst No. </label>
+                       <input type="text" class="form-control" name="vendorGst">
+          </div>
+         </div>
+         <div class="form-row">
+         <div class="form-group col-md-4">
+                         <label>Vendor Pan No.</label>
+                         <input type="text" class="form-control" name="vendorPan">
+                       </div>
+          <div class="form-group col-md-4">
             <br>
             <button type="button" class="btn btn-default" onClick="addVendor();">Add</button>
           </div>
-        </div>              
+        </div>
+
+
       </div>
     </div>  
   </div>  

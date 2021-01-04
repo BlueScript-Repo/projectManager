@@ -176,7 +176,7 @@ public class InventoryController {
             inventory.setQuantity(quantity[i]);
             inventory.setLocation(location[i]);
 
-            inventory.setReceivedDate(new SimpleDateFormat("dd/mm/yyyy").format(new Date()));
+            inventory.setReceivedDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 
             // Inventory present without TaxInvoice
             int inventoryRowId = inventoryDao.isEntityPresent(inventory, status[i], true);
@@ -377,7 +377,7 @@ public class InventoryController {
 
         taxInvoiceDetails.setProjectName(projectName);
 
-        String invoiceDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String invoiceDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         taxInvoiceDetails.setTaxInvoiceDate(invoiceDate);
 

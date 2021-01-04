@@ -40,7 +40,7 @@ public class TaxInvoiceGenerator {
 
 		String fileToAttach = taxInvoiceDetails.getInvoiceNo();
 
-		notificationUtil.pushNotification(userName,taxInvoiceDetails.getEmailAddress(),"Tax Invoice : Hamdule Industries", "Please find attached the Tax Invoice.",fileToAttach.replace("/", "_") + ".pdf" +";"+fileToAttach.replace("/", "_") + "_Annexture.xls","INBOX", new SimpleDateFormat("dd/mm/yyyy").format(new Date()));
+		notificationUtil.pushNotification(userName,taxInvoiceDetails.getEmailAddress(),"Tax Invoice : Hamdule Industries", "Please find attached the Tax Invoice.",fileToAttach.replace("/", "_") + ".pdf" +";"+fileToAttach.replace("/", "_") + "_Annexture.xls","INBOX", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 
 		taxInvoiceDetailsDao.saveTaxIvoice(taxInvoiceDetails);
 	}

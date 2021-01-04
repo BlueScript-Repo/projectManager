@@ -401,15 +401,15 @@ style="display: none;">
             <td>
                 <div class="form-group">
                     <select class="form-control" name="manufactureType"
-                    id="manufactureType" onchange="myFunction('classOrGrade');">
+                    id="manufactureType" onchange="myFunction('classOrSch');">
                     <option></option>                    
                 </select>
             </div>
         </td>
         <td>
             <div class="form-group">
-                <select class="form-control" name="classOrGrade"
-                id="classOrGrade" onchange="myFunction('materialSpecs');">
+                <select class="form-control" name="classOrSch"
+                id="classOrSch" onchange="myFunction('materialSpecs');">
                 <option></option>
             </select>
         </div>

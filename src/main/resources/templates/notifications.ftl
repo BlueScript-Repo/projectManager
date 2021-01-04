@@ -131,11 +131,7 @@
 <script src="plugins/jquery.blockUI.js"></script>
 
 <script>
-$(document).ready(function(){
-    populateItems('notificationListInbox');
-    $('#item1').show();
-    $('.mail-list-container')[0].style.height = $('.mail-view')[0].clientHeight+"px";
-});
+
 
  var emailObject = [recevier,subject,body,attachment,date,itemId];
 
