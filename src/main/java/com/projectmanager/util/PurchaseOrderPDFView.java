@@ -3,6 +3,7 @@ package com.projectmanager.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpSession;
 import com.projectmanager.dao.TaxesDao;
 import com.projectmanager.entity.TaxesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.view.AbstractView;
@@ -42,97 +45,103 @@ public class PurchaseOrderPDFView extends AbstractView {
     @Autowired
     TaxesDao taxesDao;
 
-    @Override
-    public void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
-                                        HttpServletResponse response) throws Exception {
 
-        PODetails poDetails = (PODetails) model.get("poDetails");
-        String poLineDetails = (String) model.get("poLineDetails");
+@Override
+public void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
+		HttpServletResponse response) throws Exception {
 
-        String[] poLines = poLineDetails.split(";");
+	PODetails poDetails = (PODetails) model.get("poDetails");
+	String poLineDetails = (String) model.get("poLineDetails");
 
-        String[] description = new String[poLines.length];
-        String[] quantity = new String[poLines.length];
-        String[] unitPrice = new String[poLines.length];
+	String[] poLines = poLineDetails.split(";");
+    System.out.println(poLines.length);
+	String[] description = new String[poLines.length];
+	System.out.println(description.length);
+	String[] quantity = new String[poLines.length];
+	String[] unitPrice = new String[poLines.length];
 
-        String[] make = new String[poLines.length];
-        String[] terms = poDetails.getTerm();
+	String[] make = new String[poLines.length];
+	String[] terms = poDetails.getTerm();
 
-        int index = 0;
-        for (String poLine : poLines) {
-            String[] details = poLine.split(",");
-            description[index] = details[1];
-            quantity[index] = details[2];
-            unitPrice[index] = details[3];
-            index++;
+	int index = 0;
+	for (String poLine : poLines) {
+		System.out.println(poLine);
+		String[] details = poLine.split(",");
+		description[index] = details[1];
+		quantity[index] = details[2];
+		unitPrice[index] = details[3];
+		index++;
 
-        }
+	}
 
-        //Save poDetails.getPoNumber() + ".pdf" in io.temp
-        try {
-            String userName = (String) model.get("userName");
-            String destination = System.getProperty("java.io.tmpdir") + "/" + userName + "/"
-                    + poDetails.getPoNumber().replace("/", "_") + ".pdf";
+	// Save poDetails.getPoNumber() + ".pdf" in io.temp
+	try {
+		String userName = (String) model.get("userName");
+		String destination = System.getProperty("java.io.tmpdir") + "/" + userName + "/"
+                + poDetails.getPoNumber().replace("/", "_")
+				+ ".pdf";
 
-            File fileToSave = new File(destination);
-            fileToSave.getParentFile().mkdirs();
+		File fileToSave = new File(destination);
+		fileToSave.getParentFile().mkdirs();
 
-            FileOutputStream fOut = new FileOutputStream(fileToSave);
+		FileOutputStream fOut = new FileOutputStream(fileToSave);
 
-            generatePO("27440913446-V", "27AEBPH1001B1ZM", poDetails.getPoNumber(), poDetails.getPoDate(),
-                    poDetails.getVendorName(), "", poDetails.getContactName(), poDetails.getContactNumber(),
-                    poDetails.getContactEmail(), make, description, quantity, unitPrice, terms, response, fOut);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+		generatePO("27440913446-V", "27AEBPH1001B1ZM", poDetails.getPoNumber(), poDetails.getPoDate(),
+				poDetails.getVendorName(), "", poDetails.getContactName(), poDetails.getContactNumber(),
+				poDetails.getContactEmail(),
+				poDetails.getVendorGst(), poDetails.getVendorPan(),make, description, quantity, unitPrice, terms, response, fOut);
+	} catch (Exception ex) {
+		ex.printStackTrace();
+	}
 
-    }
+}
 
-    public void generatePO(String vatTin, String gstNo, String purhaseOrderNo, String purhaseOrderDate,
-                           String venderName, String venderLocation, String receiverName, String receiverNo, String receiverEmail,
-                           String[] make, String[] description, String[] quantity, String[] unitPrice, String[] term,
-                           HttpServletResponse response, FileOutputStream fOut) {
+public void generatePO(String vatTin, String gstNo, String purhaseOrderNo, String purhaseOrderDate,
+		String venderName, String venderLocation, String receiverName, String receiverNo, String receiverEmail, String venderGst, String venderPan,
+		String[] make, String[] description, String[] quantity, String[] unitPrice, String[] term,
+		HttpServletResponse response, FileOutputStream fOut) {
 
-        try {
+	try {
 
-            Document document = new Document();
+		Document document = new Document();
 
-            PdfWriter writer = PdfWriter.getInstance(document, fOut);
-            document.open();
+		PdfWriter writer = PdfWriter.getInstance(document, fOut);
+		document.open();
 
-            ArrayList<String[]> descriptionList = new ArrayList<>();
+		ArrayList<String[]> descriptionList = new ArrayList<>();
 
-            int pages = Math.round(description.length / 10) + 1;
+		int pages = Math.round(description.length / 10) + 1;
 
-            try {
-                for (int i = 0; i < pages; i++) {
+		try {
+			for (int i = 0; i < pages; i++) {
 
-                    int end = 10 * i + 9;
-                    if (description.length < 10 * i + 10) {
-                        end = description.length - 1;
-                    }
-                    String[] newArray = Arrays.copyOfRange(description, 10 * i, end);
+				int end = 10 * i + 9;
+				if (description.length < 10 * i + 10) {
+					System.out.println(description.length < 10 * i + 10);
+					end = description.length - 1;
+				}
+				String[] newArray = Arrays.copyOfRange(description, 1 * i, end);
+				System.out.println(newArray);
+				descriptionList.add(newArray);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
-                    descriptionList.add(newArray);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+		for (String[] desc : descriptionList) {
+			generatePage(document, gstNo, purhaseOrderNo, purhaseOrderDate, venderName, venderLocation,
+					receiverName, receiverNo, receiverEmail, venderGst, venderPan, desc, unitPrice, quantity, make, term, writer);
+		}
 
-            for (String[] desc : descriptionList) {
-                generatePage(document, gstNo, purhaseOrderNo, purhaseOrderDate, venderName, venderLocation, receiverName, receiverNo, receiverEmail, desc, unitPrice, quantity, make, term, writer);
-            }
+		document.close();
+		writer.close();
 
-            document.close();
-            writer.close();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
-
+}
     protected PdfPTable createNewTable(int numberOfColumns) {
         PdfPTable table = new PdfPTable(numberOfColumns);
         table.setWidthPercentage(95);
@@ -158,8 +167,16 @@ public class PurchaseOrderPDFView extends AbstractView {
         return cell;
     }
 
-    protected void generatePage(Document document, String gstNo, String purhaseOrderNo, String purhaseOrderDate, String venderName, String venderLocation, String receiverName, String receiverNo, String receiverEmail, String[] description, String[] unitPrice, String[] quantity, String[] make, String[] term, PdfWriter writer) {
-        try {
+   
+		
+	
+
+	protected void generatePage(Document document, String gstNo, String purhaseOrderNo, String purhaseOrderDate,
+			String venderName, String venderLocation, String receiverName, String receiverNo, String receiverEmail, String vendorGst, String vendorPan,
+			String[] description, String[] unitPrice, String[] quantity, String[] make, String[] term,
+			PdfWriter writer) {
+		try {
+
             document.add(new Paragraph(70, "\u00a0"));
 
             PdfPTable table = createNewTable(2);
@@ -242,6 +259,7 @@ public class PurchaseOrderPDFView extends AbstractView {
 
             table2.setWidths(colWidts);
 
+
             PdfPCell r2c1 = createNewCell(new Paragraph("SR#", blackCalibri9));
             PdfPCell r2c2 = createNewCell(new Paragraph("Make", blackCalibri9));
             PdfPCell r2c3 = createNewCell(new Paragraph("Description", blackCalibri9));
@@ -252,6 +270,7 @@ public class PurchaseOrderPDFView extends AbstractView {
             PdfPCell r2c8 = createNewCell(new Paragraph("SGST", blackCalibri9));
             PdfPCell r2c9 = createNewCell(new Paragraph("Amount (Rs)", blackCalibri9));
 
+
             table2.addCell(r2c1);
             table2.addCell(r2c2);
             table2.addCell(r2c3);
@@ -261,6 +280,7 @@ public class PurchaseOrderPDFView extends AbstractView {
             table2.addCell(r2c7);
             table2.addCell(r2c8);
             table2.addCell(r2c9);
+
 
             double cGstTotal = 0.0;
             double sGstTotal = 0.0;
@@ -490,6 +510,7 @@ public class PurchaseOrderPDFView extends AbstractView {
             try {
 
                 File file = ResourceUtils.getFile("classpath:sign.png");
+
                 // init array with file length
                 byte[] bytesArray = new byte[(int) file.length()];
 

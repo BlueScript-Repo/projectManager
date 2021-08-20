@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.persistence.Query;
-
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,8 @@ public class BOQDetailsDao {
 		Session session = sessionFactory.getCurrentSession();
 		String selectHql = " FROM BOQDetails boqD where boqD.boqName='";
 
-		Query query = session.createQuery(selectHql + boqName + "' and projectId='" + projectId + "'");
+		Query query = session.createQuery(selectHql + boqName
+				+ "' and projectId='" + projectId + "'");
 		List results = query.getResultList();
 
 		Iterator itr = results.iterator();
@@ -85,14 +85,16 @@ public class BOQDetailsDao {
 	}
 
 	@Transactional
-	public ArrayList<String> getMatchingBOQNames(String boqName, String projectId) {
+	public ArrayList<String> getMatchingBOQNames(String boqName,
+			String projectId) {
 
 		ArrayList<String> boqNames = new ArrayList<String>();
 
 		Session session = sessionFactory.getCurrentSession();
 		String selectHql = "SELECT boqD.boqName FROM BOQDetails boqD where boqD.boqName like '%";
 
-		Query query = session.createQuery(selectHql + boqName + "%' and boqD.projectId='" + projectId + "'");
+		Query query = session.createQuery(selectHql + boqName
+				+ "%' and boqD.projectId='" + projectId + "'");
 		List results = query.getResultList();
 
 		Iterator itr = results.iterator();
@@ -123,14 +125,32 @@ public class BOQDetailsDao {
 	public String getLatestAssociatedBOQProject(String projectId) {
 		String boqName = "";
 		Session session = sessionFactory.getCurrentSession();
-		String queryString = "SELECT boqName FROM BOQDetails WHERE projectId='" + projectId
-				+ "' AND id IN (SELECT MAX(id) FROM BOQDetails WHERE projectId='" + projectId
-				+ "' AND boqName NOT LIKE 'Inquiry_%' )";
+		String queryString = "SELECT boqName FROM BOQDetails WHERE projectId='"
+				+ projectId
+				+ "' AND id IN (SELECT MAX(id) FROM BOQDetails WHERE projectId='"
+				+ projectId + "' AND boqName NOT LIKE 'Inquiry_%' )";
 		Query query = session.createQuery(queryString);
 
 		boqName = (String) query.getSingleResult();
 
 		return boqName;
+	}
+
+	@Transactional
+	public boolean getSheetName(String sheetName) {
+		boolean result = false;
+
+		Session session = sessionFactory.getCurrentSession();
+		String queryStr = "select sheetName from BOQDetails where sheetName='"
+				+ sheetName + "'";
+		Query query = session.createQuery(queryStr);
+		List sheet = query.list();
+
+		if (sheet.size() > 0) {
+			result = true;
+		}
+
+		return result;
 	}
 
 }

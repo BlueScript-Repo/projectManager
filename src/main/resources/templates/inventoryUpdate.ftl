@@ -93,11 +93,12 @@
                             <thead>
                             <tr>
                                 <th></th>
-                                <th>Item</th>
-                                <th>Material</th>
-                                <th>Type</th>
-                                <th>Manifacturing Method</th>
-                                <th>Class/Schedule</th>
+                                <th>Product</th>
+                                <th>MOC</th>
+                                <th>Manufacture Type</th>
+                                <th>Class/Grade</th>
+                                <th>Material Specs</th>
+                                <th>Standard Type</th>
                                 <th>Ends</th>
                                 <th>Size</th>
                                 <th>Purchase Rate</th>
@@ -155,7 +156,7 @@
                             </div>
                             <div class="form-group col-md-3">
                                 <label>From</label>
-                                <input type="text" class="form-control" name="receivedFrom" value="Hamdule Industries">
+                                <input type="text" class="form-control" name="receivedFrom" value="Humdule Industry">
                             </div>
                             <div class="form-group col-md-3">
                                 <label>Consignee</label>
@@ -193,11 +194,12 @@
                                         <thead>
                                         <tr>
                                             <th></th>
-                                            <th>Item</th>
-                                            <th>Material</th>
-                                            <th>Type</th>
-                                            <th>Manifacturing Method</th>
-                                            <th>Class/Schedule</th>
+                                            <th>Product</th>
+                                            <th>MOC</th>
+                                            <th>Manufacture Type</th>                                            
+                                            <th>Class/Grade</th>
+                                            <th>Material Specs</th>
+                                            <th>Standard Type</th>
                                             <th>Ends</th>
                                             <th>Size</th>
                                             <th>Quantity</th>
@@ -251,106 +253,103 @@
     <script src="js/custom.js"></script>
 
     <script type="text/javascript">
-  $(document).ready(function(){
-   (function(){
-     var inputArray = $('#projectNamesList')[0].value.split(",");
-     var names = [];
-     $.each(inputArray, function(i, el){
-      if($.inArray(el, names) === -1) 
-      {
-        names.push(el);
-      }
-    });
-     var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
-     $.each(names,function(i){
-     if(names[i]!=="")
-     {
-          var dummy1 = dummy.replace("poName",names[i]);
-          var tags = dummy1.replace("poName",names[i]);
-          $('#poList').append(tags);
-      }
-    });
+      $(document).ready(function(){
+       (function(){
+         var inputArray = $('#projectNamesList')[0].value.split(",");
+         var names = [];
+         $.each(inputArray, function(i, el){
+          if($.inArray(el, names) === -1)
+          {
+            names.push(el);
+          }
+        });
+         var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
+         $.each(names,function(i){
+         if(names[i]!=="")
+         {
+              var dummy1 = dummy.replace("poName",names[i]);
+              var tags = dummy1.replace("poName",names[i]);
+              $('#poList').append(tags);
+          }
+        });
 
-   })();
- });
-
-
+       })();
+     });
     </script>
     <script>
-  function populatePOList(projectId)
-  {
-    var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
-    $('#LoadingImage').show();
-
-    $.ajax({
-     type : 'POST',
-     data :  {'projectName' : projectId},
-     url : 'getPoList',
-     success : function(data) {
-      
-      var blank = "<option> </option>";
-      $('#poList').html(blank);
-
-      var poVals = data.split("::");
-      var inputArray = poVals[0].split(",");
-
-      console.log(poVals[1]);
-
-      var projectDetails = poVals[1].substring(poVals[1].indexOf('['), poVals[1].indexOf(']'));
-
-      var projectDetailsArray = projectDetails.split(':');
-
-
-      for(var k =0;k<projectDetailsArray.length;k++)
+      function populatePOList(projectId)
       {
-        if(projectDetailsArray[k].indexOf('contactName') !== -1)
-        {
-          $('[name="contactName"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
-        }
-        else if(projectDetailsArray[k].indexOf('contactPhone') !== -1)
-        {
-          $('[name="mobileNo"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
-        }
-        else if(projectDetailsArray[k].indexOf('contactEmail') !== -1)
-        {
-          $('[name="emailAddress"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
-        }
-        else if(projectDetailsArray[k].indexOf('address') !== -1)
-        {
-          $('[name="addressedto1"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
-        }
-        else if(projectDetailsArray[k].indexOf('gstNumber') !== -1)
-        {
-          $('[name="gstNo"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
-        }
-        
-      }
+        var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
+        $('#LoadingImage').show();
 
-      var names = [];
-      $.each(inputArray, function(i, el){
-        if($.inArray(el, names) === -1) 
-        {
-          names.push(el);
+        $.ajax({
+         type : 'POST',
+         data :  {'projectName' : projectId},
+         url : 'getPoList',
+         success : function(data) {
+
+          var blank = "<option> </option>";
+          $('#poList').html(blank);
+
+          var poVals = data.split("::");
+          var inputArray = poVals[0].split(",");
+
+          console.log(poVals[1]);
+
+          var projectDetails = poVals[1].substring(poVals[1].indexOf('['), poVals[1].indexOf(']'));
+
+          var projectDetailsArray = projectDetails.split(':');
+
+
+          for(var k =0;k<projectDetailsArray.length;k++)
+          {
+            if(projectDetailsArray[k].indexOf('contactName') !== -1)
+            {
+              $('[name="contactName"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
+            }
+            else if(projectDetailsArray[k].indexOf('contactPhone') !== -1)
+            {
+              $('[name="mobileNo"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
+            }
+            else if(projectDetailsArray[k].indexOf('contactEmail') !== -1)
+            {
+              $('[name="emailAddress"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
+            }
+            else if(projectDetailsArray[k].indexOf('address') !== -1)
+            {
+              $('[name="addressedto1"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
+            }
+            else if(projectDetailsArray[k].indexOf('gstNumber') !== -1)
+            {
+              $('[name="gstNo"]').attr('value',projectDetailsArray[k].substring(projectDetailsArray[k].indexOf('=')+1));
+            }
+
+          }
+
+          var names = [];
+          $.each(inputArray, function(i, el){
+            if($.inArray(el, names) === -1)
+            {
+              names.push(el);
+            }
+          });
+          var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
+          $.each(names,function(i){
+          if(names[i]!=="")
+          {
+            var dummy1 = dummy.replace("poName",names[i]);
+            var tags = dummy1.replace("poName",names[i]);
+            $('#poList').append(tags);
+          }
+          });
         }
       });
-      var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
-      $.each(names,function(i){
-      if(names[i]!=="")
-      {
-        var dummy1 = dummy.replace("poName",names[i]);
-        var tags = dummy1.replace("poName",names[i]);
-        $('#poList').append(tags);
+        $('#LoadingImage').hide();
       }
-      });
-    }
-  });
-    $('#LoadingImage').hide();
-  }
-
-
     </script>
     <script type="text/javascript">
       function populatePODetails(poNo)
+
       {
        $.ajax({
          type : 'POST',
@@ -358,93 +357,86 @@
          url : 'getPoDetails',
          success : function(data) {
 
-      var htmlData = data.split('::');
-      $('#poDetailsTable').html(htmlData[0]);
+          var htmlData = data.split('::');
+          $('#poDetailsTable').html(htmlData[0]);
 
-      console.log(htmlData[1]);
+          console.log(htmlData[1]);
 
-      var poDetailsArray = htmlData[1].split(':');
-      for(var k=0;k < poDetailsArray.length;k++)
-      {
-        if(poDetailsArray[k].indexOf('poNumber') !== -1)
-        {
-          $('[name="poNo"]').attr('value',poDetailsArray[k].substring(poDetailsArray[k].indexOf('=')+1));
+          var poDetailsArray = htmlData[1].split(':');
+
+          for(var k=0;k < poDetailsArray.length;k++)
+          {
+            if(poDetailsArray[k].indexOf('poNumber') !== -1)
+            {
+              $('[name="poNo"]').attr('value',poDetailsArray[k].substring(poDetailsArray[k].indexOf('=')+1));
+            }
+            else if(poDetailsArray[k].indexOf('poDate') !== -1)
+            {
+              $('[name="poDate"]').attr('value',poDetailsArray[k].substring(poDetailsArray[k].indexOf('=')+1));
+            }
+          }
         }
-        else if(poDetailsArray[k].indexOf('poDate') !== -1)
-        {
-          $('[name="poDate"]').attr('value',poDetailsArray[k].substring(poDetailsArray[k].indexOf('=')+1));
-        }
-      }
-    }
-  });
- }
-
-
-    </script>
-
-    <script>
-  $(document).ready(function()
-  {
-   // we define and invoke a function
-   (function(){
-
-     var inputArray = $('#projectNamesList').val().split(",");
-     
-     var names = [];
-     $.each(inputArray, function(i, el){
-      if($.inArray(el, names) === -1) 
-      {
-        names.push(el);
-      }
-    });
-
-     var dummy = "<option value=\"taxInvoiceName\"><h5>taxInvoiceName</h5></option>";
-     
-     $.each(names,function(i){
-
-        if(names[i]!=="")
-        {
-            var dummy1 = dummy.replace("taxInvoiceName",names[i]);
-            var tags = dummy1.replace("taxInvoiceName",names[i]);
-            $('#projectId').append(tags);
-        }
-    });
-   })();
- });
-
-
-    </script>
-
-    <script>
-  function hideOthers(idToBeOpen)
-  {
-
-    var idVals = ["challan","bill","invoice","accessory"];
-
-    for(var i=0; i< idVals.length; i++)
-    {
-      if(idToBeOpen !== idVals[i])
-      {
-        $('#'+idVals[i]).collapse("hide");
-
-      }
-      else
-      {
-        if($('#'+idToBeOpen).hasClass('collapse'))
-        {
-          $('#'+idToBeOpen).collapse("show");  
-        }
-        else
-        {
-         $('#'+idToBeOpen).collapse("hide"); 
-       }
-
+      });
      }
+    </script>
+    <script>
+      $(document).ready(function()
+      {
+       // we define and invoke a function
+       (function(){
 
-   }
- }
+         var inputArray = $('#projectNamesList').val().split(",");
 
+         var names = [];
+         $.each(inputArray, function(i, el){
+          if($.inArray(el, names) === -1)
+          {
+            names.push(el);
+          }
+        });
 
+         var dummy = "<option value=\"taxInvoiceName\"><h5>taxInvoiceName</h5></option>";
+
+         $.each(names,function(i){
+
+            if(names[i]!=="")
+            {
+                var dummy1 = dummy.replace("taxInvoiceName",names[i]);
+                var tags = dummy1.replace("taxInvoiceName",names[i]);
+                $('#projectId').append(tags);
+            }
+        });
+       })();
+     });
+    </script>
+    <script>
+      function hideOthers(idToBeOpen)
+      {
+
+        var idVals = ["challan","bill","invoice","accessory"];
+
+        for(var i=0; i< idVals.length; i++)
+        {
+          if(idToBeOpen !== idVals[i])
+          {
+            $('#'+idVals[i]).collapse("hide");
+
+          }
+          else
+          {
+            if($('#'+idToBeOpen).hasClass('collapse'))
+            {
+              $('#'+idToBeOpen).collapse("show");
+            }
+            else
+            {
+             $('#'+idToBeOpen).collapse("hide");
+           }
+
+         }
+
+       }
+     }
     </script>
     <script>
   $('#updateInventory').submit(function(event) {

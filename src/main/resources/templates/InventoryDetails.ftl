@@ -74,23 +74,22 @@
                 <tr>
                 	<th>#</th>
                 	<th></th>
-                	<th>Inventory Name</th>
-                	<th>Material</th>
-                	<th>Type</th>
-                	<th>Class Or Grade</th>
-                	<th>Category</th>
+                	<th>Product</th>
+                	<th>MOC</th>
+                	<th>Construction Type</th>
+                	<th>Class Or Schedule</th>
+                	<th>Material Specs</th>
+                  <th>Standard Type</th>
                 </tr>
               </thead>
-              <form id="updateMappingDetails" action="updateMappingDetails" method="POST">
-                <tbody>
+              <form id="updateMappingDetails" action="updateProductDetails" method="POST">
+                <tbody id="productDefinitionTab">
                  ${mappingDetails}
-
                </tbody> 
              </table> 
-             <input id="addMappingBtn" type="button" class="btn btn-primary mt-5" value="+" onclick="addRow('tblMappingDetails');change()">
+             <input id="addMappingBtn" type="button" class="btn btn-primary mt-5" value="+" onclick="addRow('tblMappingDetails');">
              <input id="updateMappingBtn" type="submit" class="btn btn-primary mt-5" value="Update">
            </form>
-
          </div>
        </div>
      </div>
@@ -118,7 +117,7 @@
              ${valvesDetails}
            </tbody> 
          </table> 
-         <input id="addValvesBtn" type="button" class="btn btn-primary mt-5" value="+" onclick="addRowInValve('tblValvesDetails');changeUpdateValvebtn()">
+         <input id="addValvesBtn" type="button" class="btn btn-primary mt-5" value="+" onclick="addRowInValve('tblValvesDetails');">
          <input id="updateValvesBtn" type="submit" class="btn btn-primary mt-5" value="Update">
        </form>
      </div>
@@ -129,10 +128,12 @@
     <div class="col-md-12">
      <form id="updateTaxesDetails" action="updateTaxesDetails" method="POST">
       ${taxesDetails}
+
        <input id="updateTaxesBtn" type="submit" class="btn btn-primary mt-5" value="Update">
      </form>
    </div>
  </div>
+
 </div>
 </div>	  		
 </div>
@@ -185,35 +186,35 @@
     {
       row = $(this).closest("tr");
 
-      var InventoryLength = $(row).find("input[name=inventoryName]").val().length;
-      var MaterialLength =$(row).find("input[name=material]").val().length;
+      var InventoryLength = $(row).find("input[name=product]").val().length;
+      var MaterialLength =$(row).find("input[name=materialOfConstruction]").val().length;
       if(InventoryLength == 0 && MaterialLength == 0 || InventoryLength == 0 || MaterialLength == 0 )
       {
-       alert("Please enter Inventory name and Material");
+       alert("Please enter Inventory Product and Material");
        return;
 
      }
    }
 
    row = $(this).closest("tr");
-   dataArrayToSend.push({ 
-    item_id : $(row).find("input[name=ItemId]").val(),
-    inventoryName  : $(row).find("input[name=inventoryName]").val(),
-    material     : $(row).find("input[name=material]").val(),
-    type     : $(row).find("input[name=type]").val(),
-    classOrGrade     : $(row).find("input[name=classOrGrade]").val(),
-    catogory     : $(row).find("input[name=catogory]").val()       
+   dataArrayToSend.push({
+    item_id                 : $(row).find("input[name=item_id]").val(),
+    product                 : $(row).find("input[name=product]").val(),
+    materialOfConstruct     : $(row).find("input[name=materialOfConstruction]").val(),
+    constructType           : $(row).find("input[name=manufactureMethod]").val(),
+    classOrSch              : $(row).find("input[name=classOrSch]").val(),
+    materialSpec            : $(row).find("input[name=materialSpecs]").val(),
+    standardType            : $(row).find("input[name=standardType]").val()
   });
 
 
  });
     //alert( JSON.stringify(values));
     e.preventDefault(); 
-
     if(dataArrayToSend.length > 0)
     {
      var ajaxReq = $.ajax({
-       url : 'updateMappingDetails',
+       url : 'updateProductDetails',
        type : 'POST',
        data : JSON.stringify(dataArrayToSend),
        dataType: "json",
@@ -242,78 +243,46 @@
   }
 
 
-  function addRow(tableID) {
+  function addRow(tableID)
+  {
 
 
    var table = document.getElementById(tableID);
 
    var rowCount = table.rows.length;
-   var row = table.insertRow(rowCount);
-
-   var cell1 = row.insertCell(0);
-   var element1 = document.createElement("input");
-   element1.value = rowCount + 1;
-   element1.type = "text";
-   element1.class = "form-control";
-   element1.name = "ItemId";
-   element1.style = "width:50px";
-   element1.style.height = "40px";
-   cell1.appendChild(element1);
-
-   var cell2 = row.insertCell(1);
-   var element2 = document.createElement("input");
-   element2.type = "checkbox";
-   element2.class="chkView";
-   element2.checked="true";
-   cell2.appendChild(element2);
+console.log(rowCount);
 
 
-   var cell3 = row.insertCell(2);
-   var element3 = document.createElement("input");
-   element3.style.width = "103px";
-   element3.style.height = "40px";
-   element3.type = "text";
-   element3.class = "form-control";
-   element3.name = "inventoryName";
-   cell3.appendChild(element3);
 
-   var cell4 = row.insertCell(3);
-   var element4 = document.createElement("input");
-   element4.style.width = "103px";
-   element4.style.height = "40px";
-   element4.type = "text";
-   element4.class = "form-control";
-   element4.name = "material";
-   cell4.appendChild(element4);
+ row = $('#tblMappingDetails tbody tr')
+ console.log(row.length);
+ rowSize= row.length - 1;
+ console.log(rowSize);
+ console.log($(row[rowSize]).find("input[name=product]").val().length);
+ InventoryLength = $(row[rowSize]).find("input[name=product]").val().length;
+ MaterialLength = $(row[rowSize]).find("input[name=materialOfConstruction]").val().length;
+   if(InventoryLength == 0 && MaterialLength == 0 || InventoryLength == 0 || MaterialLength == 0 )
+       {
+        alert("Please check already blank row present");
+        return;
 
-   var cell5 = row.insertCell(4);
-   var element5 = document.createElement("input");
-   element5.style.width = "103px";
-   element5.style.height = "40px";
-   element5.type = "text";
-   element5.name = "type";
-   element5.class = "form-control";
-   cell5.appendChild(element5);
+      }
 
-   var cell6 = row.insertCell(5);
-   var element6 = document.createElement("input");
-   element6.style.width = "103px";
-   element6.style.height = "40px";
-   element6.type = "text";
-   element6.class = "form-control";
-   element6.name = "classOrGrade";
-   element6.value = "";
-   cell6.appendChild(element6);
+  var row = table.insertRow(rowCount);
+console.log(row);
+    var productRow =
+   "<tr class='lazy' >" +
+   "<td><input type='hidden' class='form-control' value='' name='id'>"+(rowCount)+"</td>" +
+   "<td><input type='checkbox' class='chkView' checked='true' ></td>" +
+   "<td><input type='text'  class='form-control' value='' name='product'  ></td>" +
+   "<td><input type='text'  class='form-control' value='' name='materialOfConstruction' ></td>" +
+   "<td><input type='text'  class='form-control' value='' name='manufactureMethod'  ></td>" +
+   "<td><input type='text'  class='form-control' value='' name='classOrSch'  ></td>" +
+   "<td><input type='text'  class='form-control' value='' name='materialSpecs'  ></td>" +
+   "<td><input type='text'  class='form-control' value='' name='standardType'  ></td>" +
+   "</tr>";
 
-   var cell7 = row.insertCell(6);
-   var element7 = document.createElement("input");
-   element7.style.width = "103px";
-   element7.style.height = "40px";
-   element7.type = "text";
-   element7.class = "form-control";
-   element7.name = "catogory";
-   element7.value = "";
-   cell7.appendChild(element7);
+   $('#productDefinitionTab').append(productRow);
 
  } 
 
@@ -400,6 +369,17 @@
    var table = document.getElementById(tableID);
 
    var rowCount = table.rows.length;
+        row = $('#tblValvesDetails tbody tr')
+       rowSize= row.length - 1;
+       InventoryLength = $(row[rowSize]).find("input[name=model]").val().length;
+       MaterialLength = $(row[rowSize]).find("input[name=material]").val().length;
+         if(InventoryLength == 0 && MaterialLength == 0 || InventoryLength == 0 || MaterialLength == 0 )
+             {
+              alert("Please check already blank row present");
+              return;
+
+            }
+
    var row = table.insertRow(rowCount);
 
    var cell1 = row.insertCell(0);
@@ -517,7 +497,8 @@
   $('#tblMappingDetails').on('change', '.chkView[type=checkbox]', function(event) {
 
     let viewCheck = $(this);
-    let isViewChecked = !!viewCheck.prop('checked');
+
+   let isViewChecked = !!viewCheck.prop('checked');
     let isViewDisbled = !!viewCheck.prop('disabled');
     let rowChecks = viewCheck
     .closest('tr')
@@ -534,7 +515,7 @@
 
   }).find('.chkView[type=checkbox]').filter(function(index, element) {
     return !!$(element).siblings('input[type=checkbox]');
-  }).trigger('change'); 
+  }).trigger('change');
 
 </script>
 

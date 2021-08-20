@@ -11,8 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+
 @SpringBootApplication
+@Configuration
 public class ProjectManagerApplication extends SpringBootServletInitializer implements WebMvcConfigurer{
 
 	public static void main(String[] args) {

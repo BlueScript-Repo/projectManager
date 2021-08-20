@@ -2,6 +2,7 @@ package com.projectmanager.entity;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.annotation.ManagedBean;
@@ -38,7 +39,9 @@ public class TaxInvoiceGenerator {
 				taxInvoiceDetails.getTaxInvoiceNo(), false, taxInvoiceDetails.getInvoiceNo());*/
 
 		String fileToAttach = taxInvoiceDetails.getInvoiceNo();
-		notificationUtil.pushNotification(userName,taxInvoiceDetails.getEmailAddress(),"Tax Invoice : Hamdule Industries", "Please find attached the Tax Invoice.",fileToAttach.replace("/", "_") + ".pdf" +";"+fileToAttach.replace("/", "_") + "_Annexture.xls","INBOX", new Date());
+
+		notificationUtil.pushNotification(userName,taxInvoiceDetails.getEmailAddress(),"Tax Invoice : Hamdule Industries", "Please find attached the Tax Invoice.",fileToAttach.replace("/", "_") + ".pdf" +";"+fileToAttach.replace("/", "_") + "_Annexture.xls","INBOX", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+
 		taxInvoiceDetailsDao.saveTaxIvoice(taxInvoiceDetails);
 	}
 

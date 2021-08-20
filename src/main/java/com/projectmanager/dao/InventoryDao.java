@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.projectmanager.entity.Inventory;
+import com.projectmanager.entity.InventoryMuster;
 import com.projectmanager.entity.InventorySpec;
 
 @Repository
@@ -32,6 +33,7 @@ public class InventoryDao {
 			 session.flush();
 		} catch (Exception hibernateException) 
 		{
+			hibernateException.printStackTrace();
 			throw hibernateException;
 		}
 		return inventory.getInventoryRowId();
@@ -143,7 +145,7 @@ public class InventoryDao {
 		return availableQuantity;
 	}
 
-	public int isEntityPresent(Inventory inventory, String statusTo) {
+	public int isEntityPresent(Inventory inventory, String statusTo, boolean noInvoice) {
 		int associatedRowId = 0;
 		InventorySpec inventorySpec = inventory.getInventorySpec();
 
@@ -156,12 +158,21 @@ public class InventoryDao {
 				+ "invD.inventorySpec.gradeOrClass = '" + inventorySpec.getGradeOrClass() + "' and  "
 				+ "invD.inventorySpec.size = '" + inventorySpec.getSize() + "' and  " 
 				+ "invD.inventorySpec.assignedProject = '" + inventorySpec.getAssignedProject() + "' and  " 
-				+ "invD.inventorySpec.ends = '"	+ inventorySpec.getEnds() + "' and  "
-				+ "invD.invoiceNo is null ";
+				+ "invD.inventorySpec.ends = '"	+ inventorySpec.getEnds() +"'";
+
+		if(noInvoice)
+		{
+			selectHql = selectHql + " and invD.invoiceNo is null";
+		}
+		else
+		{
+			selectHql = selectHql + " and invD.invoiceNo is not null";
+		}
+
 		
 		if(!statusTo.equals("%%"))
 		{
-			selectHql = selectHql + "and invD.inventorySpec.status = '" + statusTo + "'";
+			selectHql = selectHql + " and invD.inventorySpec.status = '" + statusTo + "'";
 		}
 		
 		
@@ -181,7 +192,7 @@ public class InventoryDao {
 	}
 
 	public int isEntityPresent(Inventory inventory) {
-		return isEntityPresent(inventory, "%%");
+		return isEntityPresent(inventory, "%%", true);
 	}
 
 	@Transactional
@@ -292,4 +303,41 @@ public class InventoryDao {
 		}
 		return results;
 	}
+	
+	@Transactional
+	public ArrayList<InventoryMuster> getReceivedInventory() {
+		Session session = sessionFactory.getCurrentSession();
+		ArrayList<InventoryMuster> assignedInventory = new ArrayList<InventoryMuster>();
+		
+		try {
+			String queryStr = " from InventoryMuster";
+
+			Query query = session.createQuery(queryStr);
+			//query.setParameter("projectId", projectName);
+			
+			assignedInventory = (ArrayList<InventoryMuster>) query.getResultList();
+
+		} catch (Exception hibernateException) {
+			throw hibernateException;
+		}
+		return assignedInventory;
+	}
+	
+	@Transactional
+	public int saveReveivedInventory(InventoryMuster inventoryMuster) throws Exception {
+		Session session = sessionFactory.getCurrentSession();
+
+		try {
+			 System.out.println("Before calling save");
+			 session.save(inventoryMuster);
+			 System.out.println("After calling save");
+			// session.flush();
+		} catch (Exception hibernateException) 
+		{
+			hibernateException.printStackTrace();
+			throw hibernateException;
+		}
+		return inventoryMuster.getId();
+	}
+
 }

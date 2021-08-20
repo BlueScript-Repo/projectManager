@@ -60,115 +60,115 @@
       <!-- ================ -->
       <div class="page-wrapper">
         <#include "./header.ftl">
-    <section class="main-container">
+        <section class="main-container">
 
-      <div class="container">
-        <div class="row">
+          <div class="container">
+            <div class="row">
 
-          <!-- main start -->
-          <!-- ================ -->
-          <div class="main col-lg-8">
+              <!-- main start -->
+              <!-- ================ -->
+              <div class="main col-lg-8">
 
-            <!-- page-title start -->
-            <!-- ================ -->
-            <h3 class="page-title">PO Details</h3>
-            <div class="separator-2"></div>
-            <!-- page-title end -->
+                <!-- page-title start -->
+                <!-- ================ -->
+                <h3 class="page-title">PO Details</h3>
+                <div class="separator-2"></div>
+                <!-- page-title end -->
 
-            <form action="generateOrder" method="POST">
-              <div class="form-row">
-                <div class="form-group col-md-4">
-                  <label>Vendor Name</label>
-                  <select class='form-control' name='vendorName' id='vendorName' onChange='getCompanyDetails($(this));'>
-                    <option></option>
-                  </select>
+                <form action="generateOrder" method="POST">
+                  <div class="form-row">
+                    <div class="form-group col-md-4">
+                      <label>Vendor Name</label>
+                      <select class='form-control' name='vendorName' id='vendorName' onChange='getCompanyDetails($(this));'>
+                        <option></option>
+                      </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                     <label>Vendor Location</label>
+                     <input type="text" class="form-control" name="location">
+                   </div>
+                   <div class="form-group col-md-4">
+                    <label>Add Vendor</label>
+                    <br/>
+                    <button type="button" data-toggle="modal" data-target="#addVeenderModel" >+</button>
+                  </div>
                 </div>
-                <div class="form-group col-md-4">
-                 <label>Vendor Location</label>
-                 <input type="text" class="form-control" name="location">
-               </div>
-               <div class="form-group col-md-4">
-                <label>Add Vendor</label>
-                <br/>
-                <button type="button" data-toggle="modal" data-target="#addVeenderModel" >+</button>
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label>Contact Name</label>
+                    <input type="text" class="form-control" name="contactName">
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label>Contact Number</label>
+                    <input type="text" class="form-control" name="contactNumber">
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label>Contact Email</label>
+                    <input type="text" class="form-control" name="contactEmail">
+                  </div>
+                </div>
+                <div class="form-group form-row" id="terms">
+                 <div class="form-group col-md-6">
+                  <label for="inputAddress">Terms :</label>
+                </div>
+                <div class="form-group col-md-6">
+                  <button type="button" onClick="addTerm();">+</button>
+                </div>
+                <br>    
+                <input type="text" class="form-control" id="inputAddress" name="term">
               </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label>Contact Name</label>
-                <input type="text" class="form-control" name="contactName">
-              </div>
-              <div class="form-group col-md-4">
-                <label>Contact Number</label>
-                <input type="text" class="form-control" name="contactNumber">
-              </div>
-              <div class="form-group col-md-4">
-                <label>Contact Email</label>
-                <input type="text" class="form-control" name="contactEmail">
-              </div>
-            </div>
-            <div class="form-group form-row" id="terms">
-             <div class="form-group col-md-6">
-              <label for="inputAddress">Terms :</label>
-            </div>
-            <div class="form-group col-md-6">
-              <button type="button" onClick="addTerm();">+</button>
-            </div>
-            <br>    
-            <input type="text" class="form-control" id="inputAddress" name="term">
+              <input type="hidden" name="lineItem" value='${lineItemData}' >
+              <input type="hidden" name="lineItemSimple" value='${lineItemDataSimple}' >
+              <input type="hidden" name="projectId" value='${projectId}' >
+              <button type="submit" class="btn btn-primary">Generate PO</button>
+            </form>
+            <!-- Forms -->
+            <!-- ============================================================================== -->
           </div>
-          <input type="hidden" name="lineItem" value='${lineItemData}' >
-          <input type="hidden" name="lineItemSimple" value='${lineItemDataSimple}' >
-          <input type="hidden" name="projectId" value='${projectId}' >
-          <button type="submit" class="btn btn-primary">Generate PO</button>
-        </form>
-        <!-- Forms -->
-        <!-- ============================================================================== -->
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<div class="modal fade bd-example-modal-lg" id="addVeenderModel" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
- <div class="modal-dialog modal-lg" role="document">
-  <div class="modal-content">
-   <div class="modal-header">
-    <h4 class="modal-title" >Add New Vender</h4>
-  </div>
-  <div class="modal-body">
+    <div class="modal fade bd-example-modal-lg" id="addVeenderModel" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+     <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+       <div class="modal-header">
+        <h4 class="modal-title" >Add New Vender</h4>
+      </div>
+      <div class="modal-body">
 
-    <div class="form-row">
-      <div class="form-group col-md-4">
-        <label>Vendor Name</label>
-        <input type="text" class="form-control" name="vendorNameStr"> 
-      </div>
-      <div class="form-group col-md-4">
-        <label>Vendor Location</label>
-        <input type="text" class="form-control" name="vendorAddress">
-      </div>
-      <div class="form-group col-md-4">
-        <label>Contact Name</label>
-        <input type="text" class="form-control" name="vendorContactName">
-      </div>
-    </div>
-    <div class="form-row">    
-      <div class="form-group col-md-4">
-        <label>Contact Number</label>
-        <input type="text" class="form-control" name="vendorNumber">
-      </div>
-      <div class="form-group col-md-4">
-        <label>Contact Email</label>
-        <input type="text" class="form-control" name="vendorEmail">
-      </div>
-      <div class="form-group col-md-4">
-        <label></label>
-        <button type="button" class="btn btn-default" onClick="addVendor();">Add</button>
-      </div>
-    </div>              
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Vendor Name</label>
+            <input type="text" class="form-control" name="vendorNameStr"> 
+          </div>
+          <div class="form-group col-md-4">
+            <label>Vendor Location</label>
+            <input type="text" class="form-control" name="vendorAddress">
+          </div>
+          <div class="form-group col-md-4">
+            <label>Contact Name</label>
+            <input type="text" class="form-control" name="vendorContactName">
+          </div>
+        </div>
+        <div class="form-row">    
+          <div class="form-group col-md-4">
+            <label>Contact Number</label>
+            <input type="text" class="form-control" name="vendorNumber">
+          </div>
+          <div class="form-group col-md-4">
+            <label>Contact Email</label>
+            <input type="text" class="form-control" name="vendorEmail">
+          </div>
+          <div class="form-group col-md-4">
+            <label></label>
+            <button type="button" class="btn btn-default" onClick="addVendor();">Add</button>
+          </div>
+        </div>              
 
-  </div>
-</div>  
-</div>  
+      </div>
+    </div>  
+  </div>  
 </div>
 
 <div class="space"></div>
@@ -235,7 +235,6 @@
   {
     this.setTimeout($.unblockUI,1000);
     //$.unblockUI();
-
   }
 </script>
 
@@ -284,26 +283,33 @@
 <script>
   function addVendor()
   {
+  if(
+  			$('[name="vendorNameStr"]').val() === ''
+  			|| $('[name="vendorAddress"]').val() === ''
+  			|| $('[name="vendorContactName"]').val() === ''
+  			|| $('[name="vendorNumber"]').val() === ''
+  			|| $('[name="vendorEmail"]').val() === '')
+  		{
+  			alert('Please fill out all the fields and try again..!!');
+  			return;
+  		}
 
     showLoading();
     $.ajax({
      type : 'POST',
-     data :  {'vendorName' : $('[name="vendorNameStr"]').val(), 'vendorAddress': $('[name="vendorAddress"]').val(), 'contactName': $('[name="vendorContactName"]').val(), 'contactNumber': $('[name="vendorNumber"]').val(), 'contactEmail': $('[name="vendorEmail"]').val()},
+     data :  {'vendorName' : $('[name="vendorNameStr"]').val(), 'vendorAddress': $('[name="vendorAddress"]').val(), 'contactName': $('[name="vendorContactName"]').val(), 'contactNumber': $('[name="vendorNumber"]').val(), 'contactEmail': $('[name="vendorEmail"]').val(),'vendorGst': $('[name="vendorGst"]').val(), 'vendorPan': $('[name="vendorPan"]').val()},
      url : 'saveVendor',
      success : function(data) 
      {
       var venderName = $('[name="vendorNameStr"]').val();
-      $("[name='vendorName']").append("<option value=" + venderName + ">" + venderName + "</option>");
-
+      $("[name='vendorName']").append("<option value='" + venderName + "''>" + venderName + "</option>");
+      alert('Vender has been added successfully');
       document.getElementById("textOverlaySearch").style.display = "none";     			       
     }
   });
-
-
   }
 </script>
 <script>
-
   function getCompanyDetails(thisObj)
   {
    var vendorName = $('#vendorName').val();
@@ -336,7 +342,16 @@
        else if(ele=='contactEmail')
        {
          $('[name="contactEmail"]').val(valu);
-       }  			
+
+       } 
+       else if(ele=='vendorGst')
+       {
+         $('[name="vendorGst"]').val(valu);
+       } 
+       else if(ele=='vendorPan')
+       {
+         $('[name="vendorPan"]').val(valu);
+       }
 
      });       
     }
@@ -359,8 +374,10 @@
        venderName = venderName.trim();
 
        if(venderName != "")
+
         $("[name='vendorName']").append("<option value='" + venderName + "'>" + venderName + "</option>");
-      }
+
+    }
   }
 
 });

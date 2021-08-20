@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.projectmanager.dao.*;
 import com.projectmanager.entity.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -82,6 +83,8 @@ public class ProjectController {
 
 	@Autowired
 	ExcelReader reader;
+
+
 
 	// private static final String updateProjectviewName = "updatedDetails";
 	private static final String updateProjectviewName = "newUpdatedDetails";
@@ -278,6 +281,31 @@ public class ProjectController {
 			if (!(inventory.trim().equals("")))
 				items.append(optionsHTMLOpen + inventory.trim() + "\">" + inventory.trim() + optionsHTMLClose);
 		}
+		StringBuffer receivedInventoryStr = new StringBuffer();
+		ArrayList<InventoryMuster> receivedInventory = inventoryDao.getReceivedInventory();
+		
+		for(InventoryMuster received : receivedInventory){
+			receivedInventoryStr.append("<tr class='lazy' >");
+			receivedInventoryStr.append("<td></td>");
+			receivedInventoryStr.append("<td><label>"+ received.getInventoryName()+"</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getMaterial()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getManifMethod()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getGradeOrClass()+ "</label></td>");
+			//receivedInventoryStr.append("<td><label>" +received.getMaterialSpecs()+"</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getType()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getEnds()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getSize()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getQuantity()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getAssignedProject()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getLocation()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getChallanNo()+ "</label></td>");
+			receivedInventoryStr.append("<td><label>" + received.getConsignee()+ "</label></td>");
+			receivedInventoryStr.append("<td><label> " + received.getReceiveDate()+ "</label></td>");
+			receivedInventoryStr.append("</tr>");
+			
+		}
+
+
 
 		mav.addObject("items", items.toString());
 
@@ -288,7 +316,7 @@ public class ProjectController {
 		// TODO : Add Consumed Inventory and Consumed Accessory
 		mav.addObject("consumedInventory", consumedInventoryStr);
 		mav.addObject("consumedAccessory", ""/* consumedAccessoryStr */);
-
+		mav.addObject("receivedInventory", receivedInventoryStr);
 		if (projectDetails.getAddress() == null) {
 			mav.addObject("address", "No Details");
 			mav.addObject("contactEmail", "No Details");
@@ -364,7 +392,7 @@ public class ProjectController {
 
 		mav.addObject("clientName", project.getCompanyName() == null ? "" : project.getCompanyName());
 		mav.addObject("utility", project.getProjectDesc() == null ? "" : project.getProjectDesc());
-
+		mav.addObject("orderDate", projectDetails.getPoDate() == null ? "" : projectDetails.getPoDate());
 		mav.addObject("emailAddress", projectDetails.getContactEmail() == null ? "" : projectDetails.getContactEmail());
 		mav.addObject("addressedTo", projectDetails.getAddress() == null ? "" : projectDetails.getAddress());
 		mav.addObject("mobileNo", projectDetails.getContactPhone() == null ? "" : projectDetails.getContactPhone());
@@ -405,6 +433,10 @@ public class ProjectController {
 				mav.addObject("showInvoiceSection","display:none;");
 				mav.addObject("showInventorySection","display:none;");
 		}
+
+
+		
+
 		return mav;
 	}
 

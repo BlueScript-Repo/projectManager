@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.projectmanager.entity.TaxesEntity;
 
-
+ 
 @Repository
 public class TaxesDao {
 	
@@ -27,8 +27,8 @@ public class TaxesDao {
 		
 		Query query = session.createQuery(sqlStr);
 		
-	ArrayList<TaxesEntity> result  =(ArrayList<TaxesEntity>) query.getResultList();
-		
+	ArrayList<TaxesEntity> result  = (ArrayList<TaxesEntity>) query.getResultList();
+		System.out.println(result);
 		return result;
 	}
 

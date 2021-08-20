@@ -54,10 +54,8 @@
                                 style="width:40%;text-align:center;background-color: #ffffff;border-color:#ffffff;">
                                 <div class="card shadow-sm">
                                     <div class="card-body" style="padding:0.5rem;">
-                                        <p class="card-text text-dark" style="font-size:11px;" font-size>Detail
-                                            Engineering | IBR / NIBR Boilers | Tanks & Chimneys</p>
-                                        <p class="card-text text-dark" style="font-size:11px;">Piping Services | Turnkey
-                                            Projects | Overseas Projects</p>
+                                        <p class="card-text text-dark" style="font-size:11px;" font-size>Piping Design | Stress Analysis | CAD/CAM</p>
+                                        <p class="card-text text-dark" style="font-size:11px;"> Turnkey Projects | HVAC & Fire Fighting | Electrical Services</p>
                                     </div>
                                 </div>
                             </th>
@@ -74,13 +72,13 @@
                         <tbody>
                         <tr>
                             <td class="font-weight-bold" style="width:30%;">Delivery Challan No:</td>
-                            <td style="width:5%;">${challanNo}</td>
+                            <td style="width:15%;">${challanNo}</td>
                             <td class="font-weight-bold" style="width:30%;">Purchase Order No:</td>
                             <td style="width:5%;">${poNo}</td>
                         </tr>
                         <tr>
                             <td class="font-weight-bold" style="width:30%;">Date:</td>
-                            <td style="width:5%;">${date}</td>
+                            <td style="width:15%;">${date}</td>
                             <td class="font-weight-bold" style="width:30%;">Purchase Order Date:</td>
                             <td style="width:5%;">${poDate}</td>
                         </tr>
@@ -141,7 +139,9 @@
                         <tbody>
                         <tr>
                             <td class="font-weight-bold" colspan="3" style="width:60%;">GST Number: ${gstNo}</td>
+
                             <td class="font-weight-bold text-center" colspan="1">For Hamdule Industries</td>
+
                         </tr>
                         <tr>
                             <td class="font-weight-bold" colspan="2" style="width:60%;"></td>
@@ -186,22 +186,16 @@
                             <td class="font-weight-bold text-center">Authorised Signatory</td>
                         </tr>
                         <tr>
-                            <td class="font-weight-bold text-center"
-                                style="background-color: #c2cdd1;border-color:#c2cdd1;" colspan="4">Regd. Address : Shop
-                                # 3, Blgd C2,Manish Gardan, Udyam Nagar, Pimpri,Pune 411018
-                            </td>
+                            <td class="font-weight-bold text-center" style="background-color: #c2cdd1;border-color:#c2cdd1;" colspan="4">Regd. Address : Shop
+                                # 3, Blgd C2,Manish Gardan, Udyam Nagar, Pimpri,Pune 411018</td>
                         </tr>
                         <tr>
-                            <td class="font-weight-bold text-center"
-                                style="background-color: #c2cdd1;border-color:#c2cdd1;" colspan="4">Works: Plot No.
-                                55,Gat 55 &amp; 57, Chakan, Askhed, Tal. Khed, Pune - 410501
-                            </td>
+                            <td class="font-weight-bold text-center" style="background-color: #c2cdd1;border-color:#c2cdd1;" colspan="4">Works: Plot No.
+                                55,Gat 55 &amp; 57, Chakan, Askhed, Tal. Khed, Pune - 410501</td>
                         </tr>
                         <tr>
-                            <td class="font-weight-bold text-center"
-                                style="background-color: #c2cdd1;border-color:#c2cdd1;" colspan="4">Cell: +91 20 2750
-                                2200 | Email:business@hamduleindustries.com | www.hamduleindustries.com
-                            </td>
+                            <td class="font-weight-bold text-center" style="background-color: #c2cdd1;border-color:#c2cdd1;" colspan="4">Cell: +91 20 2750
+                                2200 | Email:business@hamduleindustries.com | www.hamduleindustries.com</td>
                         </tr>
                         </tbody>
                     </table>
