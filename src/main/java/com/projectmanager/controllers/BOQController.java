@@ -774,7 +774,8 @@ public class BOQController {
 
 	private String createInventoryRow(Inventory inv, String supplyRate, String erectionRate, String supplyAmt,
 			String erectionAmt, String baseSupplyRate, String baseErectionRate, String availableQty) {
-		String template = "<tr>" + "    <td><input type=\"checkbox\" name=\"checkbox\" class=\"checkbox\" /></td>"
+		String template = "<tr>"
+				+ "    <td><input type=\"checkbox\" name=\"checkbox\" class=\"checkbox\" /></td>"
 				+ "    <td style=\"padding: 0px 0px;text-align:center;\">inventoryVal</td>"
 				+ "    <td style=\"padding: 0px 0px;text-align:center;\">materialVal</td>"
 				+ "    <td style=\"padding: 0px 0px;text-align:center;\">invenType</td>"
@@ -782,14 +783,10 @@ public class BOQController {
 				+ "    <td style=\"padding: 0px 0px;text-align:center;\">classOrGradeVal</td>"
 				+ "    <td style=\"padding: 0px 0px;text-align:center;\">endsVal</td>"
 				+ "    <td style=\"padding: 0px 0px;text-align:center;\">sizeVal</td>"
-				/*
-				 * +
-				 * "    <td style=\"padding: 0px 0px;text-align:center;\">availableQty</td>"
-				 */
 				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"quantity\" value=\"quantityVal\" /></td>"
-				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"baseSupplyRate\" dblclick=\"updateVal();\" value=\"baseSupplyRateVal\" id=\"baseSupplyRate\" /></td>"
+				+ "    <td><div class='clearfix'><input type=\"text\" class=\"float-left\" style=\"width:45px;\" name=\"baseSupplyRate\" dblclick=\"updateVal();\" value=\"baseSupplyRateVal\" id=\"baseSupplyRate\" /><input class=\"float-right\" type=\"text\" style=\"width:45px;\" name=\"percent\" onchange=\"updateSupplyRatePercent($(this));\" placeholder=\"%\"/></div></td>"
 				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"supplyRate\" value=\"supplyRate\" /></td>"
-				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"baseErectionRate\" value=\"baseErectionRateVal\" id=\"baseErectionRate\" /></td>"
+				+ "    <td><div class='clearfix'><input type=\"text\" style=\"width:45px;\" name=\"baseErectionRate\" value=\"baseErectionRateVal\" id=\"baseErectionRate\" /><input class=\"float-right\" type=\"text\" style=\"width:45px;\" name=\"percent\" placeholder=\"%\" onchange='updateErectionRatePercent($(this));' /></div></td>"
 				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"erectionRate\" value=\"erectionRate\" /></td>"
 				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"supplyAmount\" value=\"supplyAmount\" /></td>"
 				+ "    <td><input type=\"text\" style=\"width:45px;\" name=\"erectionAmount\" value=\"erectionAmount\" /></td>"
@@ -799,7 +796,8 @@ public class BOQController {
 				+ "    <input type=\"hidden\" style=\"width:45px;\" name=\"manifMetod\" value=\"manifMetodVal\" />"
 				+ "    <input type=\"hidden\" style=\"width:45px;\" name=\"classOrGrade\" value=\"classOrGradeVal\" />"
 				+ "    <input type=\"hidden\" style=\"width:45px;\" name=\"ends\" value=\"endsVal\" />"
-				+ "    <input type=\"hidden\" style=\"width:45px;\" name=\"size\" value='sizeVal' />" + "    </tr>";
+				+ "    <input type=\"hidden\" style=\"width:45px;\" name=\"size\" value='sizeVal' />"
+				+ "    </tr>";
 
 		String rowToReturn = template;
 		rowToReturn = rowToReturn.replace("inventoryVal", inv.getInventorySpec().getInventoryName());

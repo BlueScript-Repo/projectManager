@@ -34,9 +34,9 @@ public class HibernateConfig {
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
 
         //PROD
-        /*dataSource.setUrl("jdbc:mysql://inventorymgmt.ckvjglniutlo.us-east-2.rds.amazonaws.com:3306/inventoryMgmt");
+        dataSource.setUrl("jdbc:mysql://inventorymgmt.ckvjglniutlo.us-east-2.rds.amazonaws.com:3306/inventoryMgmt");
         dataSource.setUsername("InvMgmtUser");
-        dataSource.setPassword("InvMgmtUser9933");*/
+        dataSource.setPassword("InvMgmtUser9933");
 
         //UAT
         /*dataSource.setUrl("jdbc:mysql://hamdule.cmbzdfvjyats.us-east-2.rds.amazonaws.com:3306/inventoryMgmt");
@@ -44,9 +44,9 @@ public class HibernateConfig {
         dataSource.setPassword("mhamdule9933");*/
 
         //LOCAL
-        dataSource.setUrl("jdbc:mysql://localhost:3306/inventoryMgmt");
+        /*dataSource.setUrl("jdbc:mysql://localhost:3306/inventoryMgmt");
         dataSource.setUsername("admin");
-        dataSource.setPassword("admin123");
+        dataSource.setPassword("admin123");*/
 
         return dataSource;
     }
