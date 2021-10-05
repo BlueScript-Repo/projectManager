@@ -15,7 +15,7 @@ public class BOQDetails {
 	String inventoryName;
 	String material;
 	String type;
-	String manufacturingMethod;
+	String manifacturingMethod;
 	String classOrGrade;
 	String ends;
 	String size;
@@ -36,7 +36,7 @@ public class BOQDetails {
 	}
 
 	public BOQDetails(String projectId, String boqName, String inventoryName, String material, String type,
-			String manufacturingMethod, String classOrGrade, String ends, String size, String quantity,
+			String manifacturingMethod, String classOrGrade, String ends, String size, String quantity,
 			String supplyRate, String erectionRate, String supplyAmount, String erectionAmount,
 			String baseErectionRate, String baseSupplyRate, String sheetName, String materialSpecs, String standardType) {
 		super();
@@ -45,7 +45,7 @@ public class BOQDetails {
 		this.inventoryName = inventoryName;
 		this.material = material;
 		this.type = type;
-		this.manufacturingMethod = manufacturingMethod;
+		this.manifacturingMethod = manifacturingMethod;
 		this.classOrGrade = classOrGrade;
 		this.ends = ends;
 		this.size = size;
@@ -122,12 +122,12 @@ public class BOQDetails {
 		this.type = type;
 	}
 
-	public String getManufacturingMethod() {
-		return manufacturingMethod;
+	public String getManifacturingMethod() {
+		return manifacturingMethod;
 	}
 
-	public void setManufacturingMethod(String manufacturingMethod) {
-		this.manufacturingMethod = manufacturingMethod;
+	public void setManifacturingMethod(String manifacturingMethod) {
+		this.manifacturingMethod = manifacturingMethod;
 	}
 
 	public String getClassOrGrade() {

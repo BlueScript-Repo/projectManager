@@ -655,7 +655,7 @@ public class InventoryController {
             ends[i] = itemDetails.get(i).getEnds();
             classOrGrade[i] = itemDetails.get(i).getClassOrGrade();
             inventoryName[i] = itemDetails.get(i).getInventoryName();
-            manifMetod[i] = itemDetails.get(i).getManufacturingMethod();
+            manifMetod[i] = itemDetails.get(i).getManifacturingMethod();
             size[i] = itemDetails.get(i).getSize();
             quantity[i] = "0";
             supplyRate[i] = itemDetails.get(i).getSupplyRate();
@@ -671,7 +671,7 @@ public class InventoryController {
                         && endsIn[k].equalsIgnoreCase(itemDetails.get(i).getEnds())
                         && classOrGradeIn[k].equalsIgnoreCase(itemDetails.get(i).getClassOrGrade())
                         && productIn[k].equalsIgnoreCase(itemDetails.get(i).getInventoryName())
-                        && manufactureMethodIn[k].equalsIgnoreCase(itemDetails.get(i).getManufacturingMethod())
+                        && manufactureMethodIn[k].equalsIgnoreCase(itemDetails.get(i).getManifacturingMethod())
                         && materialSpecsIn[k].equalsIgnoreCase(itemDetails.get(i).getMaterialSpecs())
                         && standardTypeIn[k].equalsIgnoreCase(itemDetails.get(i).getStandardType())
                         && sizeIn[k].equalsIgnoreCase(itemDetails.get(i).getSize())) {
