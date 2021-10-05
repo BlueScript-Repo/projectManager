@@ -89,16 +89,16 @@ public class LoginControlle {
 
 			projectIdVal = boqDetailsDao.getRecentProject();
 
-			int sizeToIterate = projectIdVal.size()>5?5:projectIdVal.size();
-
+			System.out.println(projectIdVal.size());
 			StringBuilder StringToSend = new StringBuilder();
 
-			for(int k=0; k<sizeToIterate; k++)
+			for(String projectVl : projectIdVal)
 			{
 				String template = HTMLElements.CURRENT_PROJECTS;
 
-				Project project = projectDao.getProject(Integer.parseInt(projectIdVal.get(k)));
+				Project project = projectDao.getProject(Integer.parseInt(projectVl));
 
+				System.out.println(project);
 				template = template.replaceAll("projectNameVal",project.getProjectName());
 				template = template.replaceAll("projectIdVal", String.valueOf(project.getProjectId()));
 				template = template.replaceAll("projectDescVal",project.getProjectDesc());
@@ -106,13 +106,13 @@ public class LoginControlle {
 				StringToSend.append(template);
 			}
 
-
 			modelAndView.addObject("projectList", StringToSend.toString());
 		}
 
 		return modelAndView;
 
 	}
+
 
 	private boolean validateLogin(LoginInfo loginInfo) {
 		boolean validLogin = false;
@@ -134,19 +134,21 @@ public class LoginControlle {
 	}
 
 	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-	protected @ResponseBody String registerUser(UserDetails userDetails, String userRole) {
-		String result = "SUCCESS";
-		boolean loginInfoAdded = false;
-		boolean userRegistered = userDetailsDao.saveUser(userDetails);
-		if (userRegistered) {
-			loginInfoAdded = loginInfoDao
-					.addLoginInfo(new LoginInfo(userDetails.getUserName(), userDetails.getUserPassword(), userRole));
+	protected @ResponseBody
+	boolean registerUser(UserDetails userDetails, String userRole) {
+
+		boolean loginInfoAdded = true;
+		try {
+			boolean userRegistered = userDetailsDao.saveUser(userDetails);
+			if (userRegistered) {
+				loginInfoDao
+						.addLoginInfo(new LoginInfo(userDetails.getUserName(), userDetails.getUserPassword(), userRole));
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			loginInfoAdded = false;
 		}
 
-		if (!userRegistered || !loginInfoAdded) {
-			result = "FAILURE";
-		}
-
-		return result;
+		return loginInfoAdded;
 	}
 }

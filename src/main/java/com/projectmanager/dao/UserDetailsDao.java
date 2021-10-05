@@ -46,15 +46,18 @@ public class UserDetailsDao {
 
 	@Transactional
 	public boolean saveUser(UserDetails userDetails) {
-		try {
-			Session session = sessionFactory.getCurrentSession();
+
+		boolean saved = false;
+
+		Session session = sessionFactory.getCurrentSession();
+		try{
 			session.save(userDetails);
-			return true;
+			saved= true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 
 		}
-		return false;
+		return saved;
 	}
 	
 	@Transactional

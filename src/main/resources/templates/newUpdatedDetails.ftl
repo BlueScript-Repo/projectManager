@@ -214,9 +214,7 @@
         <form name="fileUploadForm" action="import" method="post"
         enctype="multipart/form-data" style="margin: 0px">
         <button class="btn btn-default" name="uploadFile">Upload</button>
-        <label for="choose">Choose File</label>
-        <input id="choose" type="file" name="file" onClick="toggleImportSec();"
-        style="display:none;" class="btn btn-default">
+        <input type="file" name="file" onClick="toggleImportSec();" class="upload-box">
     </form>
 </div>
 </div>
@@ -478,9 +476,9 @@ style="display: none;">
         data-animation-effect="fadeInDownSmall" data-effect-delay="100">
         <label></label>
         <br>
-        <button type="button" class="btn btn-default" onclick="appendInventory();">
-            Add Inventory
-        </button>
+
+        <button class="btn btn-default" onclick="appendInventory();">Add Inventory</button>
+
     </div>
 </div>
 </div>
@@ -525,9 +523,10 @@ style="display: none;">
         data-animation-effect="fadeInDownSmall" data-effect-delay="100">
         <label></label>
         <br>
-        <button type="button" class="btn btn-default" onclick="appendAccessory();">
+        <button type="button" class="btn btn-default" onClick="appendAccessory();">
             Add Accessory
         </button>
+
     </div>
 </div>
 </div>

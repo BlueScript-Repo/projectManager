@@ -36,6 +36,7 @@
     {
       if(idToBeOpen !== idVals[i])
       {
+      {
         $('#'+idVals[i]).collapse("hide");
 
       }
@@ -657,7 +658,7 @@ function cleanArray(actual)
         + "    <td><input class='form-control' style='width:60px;' type='text' name='supplyAmount' value=''></input></td>"
         + "    <td><input class='form-control' style='width:60px;' type='text' name='erectionAmount' value=''></input></td>";
 
-  
+   console.log(template);
     $('.inventoryDetails').css("display","block");            
 
     var sheet = $($('.nav-link.active.show')[1]).attr('href').substring(1);

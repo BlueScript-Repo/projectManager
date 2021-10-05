@@ -110,7 +110,7 @@ public class BOQDetailsDao {
 	public ArrayList<String> getRecentProject() {
 		ArrayList<String> projectId = new ArrayList<>();
 		Session session = sessionFactory.getCurrentSession();
-		String queryString = "SELECT distinct(projectId) FROM BOQDetails";
+		String queryString = "SELECT distinct(projectId) FROM BOQDetails ";
 		Query query = session.createQuery(queryString);
 
 		try {

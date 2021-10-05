@@ -155,6 +155,7 @@ public class ProjectController {
 		return mav;
 	}
 
+
 	@RequestMapping(value = "/searchProject", method = RequestMethod.POST)
 	protected ModelAndView searchProject(String projectName, String projevtDesc, String companyName) throws Exception {
 
@@ -189,6 +190,7 @@ public class ProjectController {
 
 		return mav;
 	}
+
 
 	@RequestMapping(value="/test2")
 	public String showTestPage2(HttpServletRequest request, Project project) {
@@ -487,11 +489,20 @@ public class ProjectController {
 	}
 
 	@RequestMapping(value = "/saveVendor", method = RequestMethod.POST)
-	protected @ResponseBody boolean saveVendor(VendorDetails vendorDetails)
+	protected @ResponseBody boolean saveVendor(VendorDetailsRequest request)
 	{
 		boolean vendorSaved = true;
 		try
 		{
+			String gstNo="27"+request.getVendorGst();
+			VendorDetails vendorDetails=new VendorDetails();
+			vendorDetails.setContactEmail(request.getContactEmail());
+			vendorDetails.setContactName(request.getContactName());
+			vendorDetails.setContactNumber(request.getContactNumber());
+			vendorDetails.setVendorAddress(request.getVendorAddress());
+			vendorDetails.setVendorName(request.getVendorName());
+			vendorDetails.setVendorPan(request.getVendorPan());
+			vendorDetails.setVendorGst(gstNo);
 			vendorDetailsDao.saveVendorDetails(vendorDetails);
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -72,12 +72,14 @@
                                     <option></option>
                                 </select>
                             </div>
+
                             <div class="form-group ml-2">
                             </div>
                             <div class="form-group ml-5">
                                 <h3 style="color: #ffffff;">Purchase Order to Vendors</h3>
                                 <select class="form-control" id="poList"
                                         onChange="populatePODetails($('#poList').val());">
+                                         <option></option>
                                 </select>
                             </div>
                         </form>
@@ -264,14 +266,6 @@
           }
         });
          var dummy = "<option value=\"poName\"><h5>poName</h5></option>";
-         $.each(names,function(i){
-         if(names[i]!=="")
-         {
-              var dummy1 = dummy.replace("poName",names[i]);
-              var tags = dummy1.replace("poName",names[i]);
-              $('#poList').append(tags);
-          }
-        });
 
        })();
      });

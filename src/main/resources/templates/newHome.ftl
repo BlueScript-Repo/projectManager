@@ -165,10 +165,15 @@
             <label>Contact Email</label>
             <input type="text" class="form-control" name="vendorEmail" required>
           </div>
-          <div class="form-group col-md-4">
-                       <label>Vendor Gst No. </label>
-                       <input type="text" class="form-control" name="vendorGst">
-          </div>
+
+          <div class="form-group col-md-5">
+                       <label>Vendor Gst No.</label>
+                        <div class="form-group row">
+                       <select required  name="title" id="title" class="form-select" placeholder="select"><option class="a-prompt" value=""> 27
+                       <input type="text" class="form-control" name="vendorGst" >
+                       </div>
+
+         </div>
          </div>
          <div class="form-row">
          <div class="form-group col-md-4">
@@ -334,7 +339,8 @@
       || $('[name="vendorAddress"]').val() === ''
       || $('[name="vendorContactName"]').val() === ''
       || $('[name="vendorNumber"]').val() === ''
-      || $('[name="vendorEmail"]').val() === '') 
+      || $('[name="vendorEmail"]').val() === ''
+      || $('[name="vendorGst"]').val() === '')
     {
       alert('Please fill out all the fields and try again..!!');
       return;
@@ -343,7 +349,7 @@
     showLoading();
     $.ajax({
      type : 'POST',
-     data :  {'vendorName' : $('[name="vendorNameStr"]').val(), 'vendorAddress': $('[name="vendorAddress"]').val(), 'contactName': $('[name="vendorContactName"]').val(), 'contactNumber': $('[name="vendorNumber"]').val(), 'contactEmail': $('[name="vendorEmail"]').val()},
+     data :  {'vendorName' : $('[name="vendorNameStr"]').val(), 'vendorAddress': $('[name="vendorAddress"]').val(), 'contactName': $('[name="vendorContactName"]').val(), 'contactNumber': $('[name="vendorNumber"]').val(), 'contactEmail': $('[name="vendorEmail"]').val(),'vendorGst' : $('[name="vendorGst"]').val(),},
      url : 'saveVendor',
      success : function(data) 
      {
@@ -390,7 +396,16 @@
      url : 'registerUser',
      success : function(data) 
      {
-      alert('User has been added successfully.');
+     var userName = $('[name="userName"]').val();
+     if(data)
+            {
+            alert('User has been added successfully.');
+
+            }
+    else
+     {
+       alert('Error adding User. Please verify, the User is not already added or try again..!!');
+     }
     }
   });
     hideLoading();
